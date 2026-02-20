@@ -4,7 +4,11 @@ import { toast } from "react-hot-toast";
 import { useAuthStore } from "@/store/authStore";
 import { Camera, Save, Dumbbell, Target, MapPin, Calendar } from "lucide-react";
 
-const GYM_LOCATIONS = ["Men's Gym 1", "Men's Gym 2", "Ladies Gym", "SAC Gym", "SJT Gym", "A-Block Gym"];
+const GYM_LOCATIONS = [
+  "Fitty New (Mens)", "Fitty Old (Mens)", "Outdoor Gym (Mens)", "Indoor Gym (Mens)", "Trendset Gym (Mens)",
+  "Girls Gym",
+  "Infinity Fitness (Outside)", "Muscle Engineer (Outside)", "IMMC Fit Club (Outside)", "Stay Fit (Outside)", "AJ Fitness (Outside)"
+];
 const LEVELS       = ["Beginner", "Intermediate", "Advanced"];
 const GOALS        = ["Muscle Gain", "Fat Loss", "Strength", "General Fitness", "Athletic Performance"];
 const GENDERS      = ["Male", "Female", "Non-binary", "Prefer not to say"];
@@ -184,7 +188,7 @@ export default function ProfilePage() {
           <div className="flex flex-col gap-2 text-left">
             {user?.gymLocation && (
               <div className="flex items-center gap-2" style={{ fontSize: "12px", color: "var(--color-text-secondary)" }}>
-                <MapPin size={12} color="var(--color-accent)" style={{ shrink: 0 }} />
+                <MapPin size={12} color="var(--color-accent)" style={{ flexShrink: 0 }} />
                 {user.gymLocation}
               </div>
             )}

@@ -7,8 +7,12 @@ import { useAuthStore } from "@/store/authStore";
 
 const STEPS = ["Profile Info", "Workout Preferences", "Partner Traits"];
 
-const GYM_LOCATIONS = ["Men's Gym 1", "Men's Gym 2", "Ladies Gym", "SAC Gym", "SJT Gym", "A-Block Gym"];
-const WORKOUT_TIMES = ["Early Morning (5–7 AM)", "Morning (7–9 AM)", "Afternoon (12–2 PM)", "Evening (5–7 PM)", "Night (7–9 PM)", "Late Night (9–11 PM)"];
+const GYM_LOCATIONS = [
+  "Fitty New (Mens)", "Fitty Old (Mens)", "Outdoor Gym (Mens)", "Indoor Gym (Mens)", "Trendset Gym (Mens)",
+  "Girls Gym",
+  "Infinity Fitness (Outside)", "Muscle Engineer (Outside)", "IMMC Fit Club (Outside)", "Stay Fit (Outside)", "AJ Fitness (Outside)"
+];
+const WORKOUT_TIMES = ["Morning (6 AM - 9 AM)", "Afternoon (3 PM - 5 PM)", "Evening (5 PM - 8 PM)", "Full Time (Outside VIT)"];
 const DURATIONS = ["45 min", "1 hour", "1.5 hours", "2 hours", "2+ hours"];
 const SPLITS = ["Push Pull Legs", "Bro Split", "Upper / Lower", "Full Body", "Custom"];
 const STYLES = ["Heavy Lifting", "Hypertrophy", "Functional Training", "Cardio-Focused", "Mixed"];
