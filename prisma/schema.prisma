@@ -1,0 +1,114 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id            String    @id @default(cuid())
+  name          String
+  email         String    @unique
+  passwordHash  String
+  age           Int?
+  gender        String?
+  bio           String?
+  gymLocation   String?
+  fitnessLevel  String?
+  fitnessGoal   String?
+  profileImage  String?
+  course        String?
+  year          String?
+  fcmToken      String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  questionnaire   Questionnaire?
+  swipesGiven     Swipe[]        @relation("SwipeFrom")
+  swipesReceived  Swipe[]        @relation("SwipeTo")
+  matchesAsUser1  Match[]        @relation("MatchUser1")
+  matchesAsUser2  Match[]        @relation("MatchUser2")
+  messagesSent    Message[]
+  notifications   Notification[]
+
+  @@index([email])
+}
+
+model Questionnaire {
+  id                   String   @id @default(cuid())
+  userId               String   @unique
+  workoutSplit         String?
+  workoutTime          String?
+  workoutDuration      String?
+  trainingStyle        String?
+  experienceLevel      String?
+  preferredPartnerTraits String[]
+  daysPerWeek          Int?
+  comfortableSpotting  Boolean  @default(false)
+  strictRoutine        Boolean  @default(false)
+  flexibleSchedule     Boolean  @default(false)
+  createdAt            DateTime @default(now())
+  updatedAt            DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Swipe {
+  id         String   @id @default(cuid())
+  fromUserId String
+  toUserId   String
+  liked      Boolean
+  createdAt  DateTime @default(now())
+
+  fromUser User @relation("SwipeFrom", fields: [fromUserId], references: [id], onDelete: Cascade)
+  toUser   User @relation("SwipeTo", fields: [toUserId], references: [id], onDelete: Cascade)
+
+  @@unique([fromUserId, toUserId])
+  @@index([fromUserId])
+  @@index([toUserId])
+}
+
+model Match {
+  id        String   @id @default(cuid())
+  user1Id   String
+  user2Id   String
+  active    Boolean  @default(true)
+  createdAt DateTime @default(now())
+
+  user1    User      @relation("MatchUser1", fields: [user1Id], references: [id], onDelete: Cascade)
+  user2    User      @relation("MatchUser2", fields: [user2Id], references: [id], onDelete: Cascade)
+  messages Message[]
+
+  @@unique([user1Id, user2Id])
+  @@index([user1Id])
+  @@index([user2Id])
+}
+
+model Message {
+  id        String   @id @default(cuid())
+  matchId   String
+  senderId  String
+  content   String
+  seen      Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  match  Match @relation(fields: [matchId], references: [id], onDelete: Cascade)
+  sender User  @relation(fields: [senderId], references: [id], onDelete: Cascade)
+
+  @@index([matchId])
+  @@index([senderId])
+}
+
+model Notification {
+  id        String   @id @default(cuid())
+  userId    String
+  type      String
+  message   String
+  read      Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
