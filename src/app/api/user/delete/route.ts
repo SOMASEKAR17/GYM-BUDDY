@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getCurrentUser } from "@/lib/auth";
-import { adminAuth } from "@/lib/fbAdmin";
+import { adminAuth } from "@/lib/firebaseAdmin";
 import { cookies } from "next/headers";
 
 export async function DELETE(req: NextRequest) {
