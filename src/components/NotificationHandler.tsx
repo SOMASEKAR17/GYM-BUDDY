@@ -30,8 +30,12 @@ export default function NotificationHandler() {
                         });
                     }
                 }
-            } catch (error) {
-                console.error("FCM Error:", error);
+            } catch (error: any) {
+                if (error.code === "messaging/token-subscribe-failed") {
+                    console.warn("FCM Subscription failed. This usually happens if the VAPID key is invalid or the browser blocked the request.");
+                } else {
+                    console.error("FCM Error:", error);
+                }
             }
         };
 

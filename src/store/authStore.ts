@@ -1,5 +1,7 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
+import { auth } from "@/lib/firebase";
+import { signOut } from "firebase/auth";
 
 export interface UserProfile {
     id: string;
@@ -20,9 +22,11 @@ export interface UserProfile {
 interface AuthState {
     user: UserProfile | null;
     isLoading: boolean;
+    isHydrated: boolean;
     setUser: (user: UserProfile | null) => void;
     setLoading: (loading: boolean) => void;
-    logout: () => void;
+    setHydrated: (hydrated: boolean) => void;
+    logout: () => Promise<void>;
 }
 
 export const useAuthStore = create<AuthState>()(
@@ -30,16 +34,27 @@ export const useAuthStore = create<AuthState>()(
         (set) => ({
             user: null,
             isLoading: false,
+            isHydrated: false,
             setUser: (user) => set({ user }),
             setLoading: (isLoading) => set({ isLoading }),
-            logout: () => {
+            setHydrated: (isHydrated) => set({ isHydrated }),
+            logout: async () => {
                 set({ user: null });
-                fetch("/api/auth/logout", { method: "POST" });
+                try {
+                    await signOut(auth);
+                    await fetch("/api/auth/logout", { method: "POST" });
+                } catch (error) {
+                    console.error("Logout error:", error);
+                }
             },
         }),
         {
             name: "auth-storage",
             partialize: (state) => ({ user: state.user }),
+            onRehydrateStorage: () => (state) => {
+                state?.setHydrated(true);
+            },
         }
     )
 );
+

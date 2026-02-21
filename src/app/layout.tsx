@@ -3,6 +3,8 @@ import "./globals.css";
 import { Toaster } from "react-hot-toast";
 import BackgroundBeams from "@/components/BackgroundBeams";
 import NotificationHandler from "@/components/NotificationHandler";
+import AuthLoader from "@/components/AuthLoader";
+
 
 export const metadata: Metadata = {
   title: "GymBuddy | VIT Gym Partner Matching",
@@ -26,6 +28,8 @@ export default function RootLayout({
         {/* Fixed 3-D beam background — sits at z-0, behind everything */}
         <BackgroundBeams />
         <NotificationHandler />
+        <AuthLoader />
+
 
         {/* Noise texture overlay — z-999, above everything */}
         <div className="noise-overlay" />

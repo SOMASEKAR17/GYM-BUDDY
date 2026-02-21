@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { signToken } from "@/lib/jwt";
-import { adminAuth } from "@/lib/firebaseAdmin";
+import { adminAuth } from "@/lib/fbAdmin";
 import { z } from "zod";
 
 const schema = z.object({
