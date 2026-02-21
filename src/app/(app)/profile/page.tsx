@@ -2,7 +2,7 @@
 import { useState, useEffect } from "react";
 import { toast } from "react-hot-toast";
 import { useAuthStore } from "@/store/authStore";
-import { Camera, Save, Dumbbell, Target, MapPin, Calendar } from "lucide-react";
+import { Camera, Save, Dumbbell, Target, MapPin, Calendar, User } from "lucide-react";
 
 const GYM_LOCATIONS = [
   "Fitty New (Mens)", "Fitty Old (Mens)", "Outdoor Gym (Mens)", "Indoor Gym (Mens)", "Trendset Gym (Mens)",
@@ -111,7 +111,7 @@ export default function ProfilePage() {
     );
   };
 
-  const avatarLetter = user?.name?.charAt(0).toUpperCase() || "U";
+
 
   return (
     <div className="max-w-[860px] mx-auto px-4 md:px-8 py-8 md:py-10">
@@ -145,15 +145,12 @@ export default function ProfilePage() {
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
-                fontFamily: "var(--font-heading)",
-                fontSize: "40px",
-                fontWeight: 700,
                 color: "white",
                 margin: "0 auto",
                 boxShadow: "0 0 24px rgba(230,57,70,0.3)",
               }}
             >
-              {avatarLetter}
+              <User size={48} />
             </div>
             <button
               title="Change photo"

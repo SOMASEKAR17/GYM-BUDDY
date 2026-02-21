@@ -221,14 +221,11 @@ export default function Navbar() {
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
-                fontSize: "13px",
-                fontWeight: 700,
-                fontFamily: "var(--font-heading)",
                 color: "white",
                 flexShrink: 0,
               }}
             >
-              {user?.name?.charAt(0).toUpperCase() || "U"}
+              <User size={18} />
             </div>
             <button
               id="logout-btn"
@@ -426,13 +423,10 @@ export default function Navbar() {
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
-                  fontSize: "18px",
-                  fontWeight: 700,
-                  fontFamily: "var(--font-heading)",
                   color: "white",
                 }}
               >
-                {user?.name?.charAt(0).toUpperCase() || "U"}
+                <User size={24} />
               </div>
               <div>
                 <div style={{ fontSize: "16px", fontWeight: 700, color: "white" }}>{user?.name}</div>

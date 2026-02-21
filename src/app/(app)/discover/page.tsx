@@ -1,7 +1,7 @@
 "use client";
 import { useState, useEffect, useRef } from "react";
 import { toast } from "react-hot-toast";
-import { X, Heart, Dumbbell, Clock, Target, Star, MapPin, ChevronLeft, ChevronRight } from "lucide-react";
+import { X, Heart, Dumbbell, Clock, Target, Star, MapPin, ChevronLeft, ChevronRight, User } from "lucide-react";
 
 interface Candidate {
   id: string;
@@ -118,7 +118,7 @@ export default function DiscoverPage() {
   const current = candidates[currentIndex];
   const next = candidates[currentIndex + 1];
 
-  const avatarLetter = current?.name?.charAt(0).toUpperCase() || "?";
+
 
   if (loading) {
     return (
@@ -197,8 +197,8 @@ export default function DiscoverPage() {
             <div className="glass-card hidden md:block" style={{ padding: "16px", opacity: 0.6 }}>
               <p style={{ fontSize: "12px", color: "var(--color-text-muted)", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: "8px" }}>Up next</p>
               <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
-                <div style={{ width: 36, height: 36, borderRadius: "50%", background: "linear-gradient(135deg, #333, #555)", display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "var(--font-heading)", fontWeight: 700, fontSize: "14px" }}>
-                  {next.name.charAt(0)}
+                <div style={{ width: 36, height: 36, borderRadius: "50%", background: "linear-gradient(135deg, #333, #555)", display: "flex", alignItems: "center", justifyContent: "center", color: "white" }}>
+                  <User size={18} />
                 </div>
                 <div>
                   <div style={{ fontWeight: 600, fontSize: "14px" }}>{next.name}</div>
@@ -278,13 +278,10 @@ export default function DiscoverPage() {
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
-                fontFamily: "var(--font-heading)",
-                fontSize: "44px",
-                fontWeight: 700,
                 color: "white",
                 boxShadow: "0 0 32px rgba(230,57,70,0.4)",
               }}>
-                {avatarLetter}
+                <User size={48} />
               </div>
 
               {/* Compatibility badge */}

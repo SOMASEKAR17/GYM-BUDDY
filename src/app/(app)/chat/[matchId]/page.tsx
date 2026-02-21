@@ -2,7 +2,7 @@
 import { useState, useEffect, useRef } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { formatDistanceToNow } from "date-fns";
-import { Send, ArrowLeft, Check, CheckCheck } from "lucide-react";
+import { Send, ArrowLeft, Check, CheckCheck, User } from "lucide-react";
 import { useAuthStore } from "@/store/authStore";
 import { toast } from "react-hot-toast";
 
@@ -122,8 +122,8 @@ export default function ChatPage() {
         <button onClick={() => router.push("/matches")} style={{ background: "none", border: "none", color: "var(--color-text-muted)", cursor: "pointer", display: "flex", alignItems: "center" }}>
           <ArrowLeft size={20} />
         </button>
-        <div style={{ width: 42, height: 42, borderRadius: "50%", background: "linear-gradient(135deg, var(--color-accent), var(--color-accent-dark))", display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "var(--font-heading)", fontSize: "18px", fontWeight: 700 }}>
-          {partner?.name?.charAt(0) || "?"}
+        <div style={{ width: 42, height: 42, borderRadius: "50%", background: "linear-gradient(135deg, var(--color-accent), var(--color-accent-dark))", display: "flex", alignItems: "center", justifyContent: "center", color: "white" }}>
+          <User size={20} />
         </div>
         <div style={{ flex: 1 }}>
           <div style={{ fontWeight: 600, fontSize: "15px" }}>{partner?.name || "Loading..."}</div>
@@ -161,8 +161,8 @@ export default function ChatPage() {
             return (
               <div key={msg.id} style={{ display: "flex", justifyContent: isMe ? "flex-end" : "flex-start", gap: "8px", alignItems: "flex-end" }}>
                 {!isMe && (
-                  <div style={{ width: 28, height: 28, borderRadius: "50%", background: "linear-gradient(135deg, #555, #333)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "11px", fontWeight: 700, fontFamily: "var(--font-heading)", flexShrink: 0 }}>
-                    {msg.sender.name.charAt(0)}
+                  <div style={{ width: 28, height: 28, borderRadius: "50%", background: "linear-gradient(135deg, #555, #333)", display: "flex", alignItems: "center", justifyContent: "center", color: "white", flexShrink: 0 }}>
+                    <User size={14} />
                   </div>
                 )}
                 <div style={{ maxWidth: "65%" }}>

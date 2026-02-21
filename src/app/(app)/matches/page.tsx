@@ -1,7 +1,7 @@
 "use client";
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { MessageSquare, Dumbbell } from "lucide-react";
+import { MessageSquare, Dumbbell, User } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 
 interface MatchItem {
@@ -105,12 +105,9 @@ export default function MatchesPage() {
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "center",
-                    fontFamily: "var(--font-heading)",
-                    fontSize: "20px",
-                    fontWeight: 700,
                     color: "white",
                   }}>
-                    {match.partner.name.charAt(0).toUpperCase()}
+                    <User size={24} />
                   </div>
                   {match.hasUnread && (
                     <div style={{
