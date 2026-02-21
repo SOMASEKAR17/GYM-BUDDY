@@ -1,5 +1,7 @@
 generator client {
-  provider = "prisma-client-js"
+  provider        = "prisma-client-js"
+  output          = "../src/generated/prisma"
+  previewFeatures = ["driverAdapters"]
 }
 
 datasource db {
@@ -7,51 +9,132 @@ datasource db {
 }
 
 model User {
-  id            String    @id @default(cuid())
-  name          String
-  email         String    @unique
-  passwordHash  String
-  age           Int?
-  gender        String?
-  bio           String?
-  gymLocation   String?
-  fitnessLevel  String?
-  fitnessGoal   String?
-  profileImage  String?
-  course        String?
-  year          String?
-  fcmToken      String?
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
-
-  questionnaire   Questionnaire?
-  swipesGiven     Swipe[]        @relation("SwipeFrom")
-  swipesReceived  Swipe[]        @relation("SwipeTo")
-  matchesAsUser1  Match[]        @relation("MatchUser1")
-  matchesAsUser2  Match[]        @relation("MatchUser2")
+  id              String          @id @default(cuid())
+  name            String
+  email           String          @unique
+  passwordHash    String
+  age             Int?
+  gender          String?
+  bio             String?
+  gymLocation     String?
+  fitnessLevel    String?
+  fitnessGoal     String?
+  profileImage    String?
+  course          String?
+  year            String?
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime        @updatedAt
+  fcmToken        String?
+  groupsLed       Group[]         @relation("GroupLeader")
+  groupMembership GroupMember?
+  joinRequests    JoinRequest[]
+  matchesAsUser1  Match[]         @relation("MatchUser1")
+  matchesAsUser2  Match[]         @relation("MatchUser2")
   messagesSent    Message[]
   notifications   Notification[]
+  prs             Pr[]
+  prEndorsements  PrEndorsement[]
+  questionnaire   Questionnaire?
+  swipesGiven     Swipe[]         @relation("SwipeFrom")
+  swipesReceived  Swipe[]         @relation("SwipeTo")
 
   @@index([email])
 }
 
-model Questionnaire {
-  id                   String   @id @default(cuid())
-  userId               String   @unique
-  workoutSplit         String?
-  workoutTime          String?
-  workoutDuration      String?
-  trainingStyle        String?
-  experienceLevel      String?
-  preferredPartnerTraits String[]
-  daysPerWeek          Int?
-  comfortableSpotting  Boolean  @default(false)
-  strictRoutine        Boolean  @default(false)
-  flexibleSchedule     Boolean  @default(false)
-  createdAt            DateTime @default(now())
-  updatedAt            DateTime @updatedAt
+model Group {
+  id                  String        @id @default(cuid())
+  name                String
+  description         String
+  leaderId            String
+  gymLocation         String
+  minimumRequirements String
+  rules               String
+  privacyType         String
+  maxMembers          Int
+  createdAt           DateTime      @default(now())
+  updatedAt           DateTime      @updatedAt
+  leader              User          @relation("GroupLeader", fields: [leaderId], references: [id])
+  members             GroupMember[]
+  requests            JoinRequest[]
+  prs                 Pr[]          @relation("GroupPRs")
 
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  @@index([leaderId])
+}
+
+model GroupMember {
+  id       String   @id @default(cuid())
+  groupId  String
+  userId   String   @unique
+  role     String
+  joinedAt DateTime @default(now())
+  group    Group    @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([groupId])
+  @@index([userId])
+}
+
+model JoinRequest {
+  id        String   @id @default(cuid())
+  groupId   String
+  userId    String
+  status    String
+  createdAt DateTime @default(now())
+  group     Group    @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([groupId])
+  @@index([userId])
+}
+
+model Pr {
+  id           String         @id @default(cuid())
+  userId       String
+  groupId      String
+  exerciseName String
+  weight       Float
+  reps         Int
+  status       String
+  proofUrl     String?
+  createdAt    DateTime       @default(now())
+  group        Group          @relation("GroupPRs", fields: [groupId], references: [id], onDelete: Cascade)
+  user         User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  endorsements PrEndorsement[]
+
+  @@index([userId])
+  @@index([groupId])
+  @@map("PR")
+}
+
+model PrEndorsement {
+  id               String   @id @default(cuid())
+  prId             String
+  endorsedByUserId String
+  createdAt        DateTime @default(now())
+  user             User     @relation(fields: [endorsedByUserId], references: [id], onDelete: Cascade)
+  pr               Pr       @relation(fields: [prId], references: [id], onDelete: Cascade)
+
+  @@unique([prId, endorsedByUserId])
+  @@index([prId])
+  @@map("PREndorsement")
+}
+
+model Questionnaire {
+  id                     String   @id @default(cuid())
+  userId                 String   @unique
+  workoutSplit           String?
+  workoutTime            String?
+  workoutDuration        String?
+  trainingStyle          String?
+  experienceLevel        String?
+  preferredPartnerTraits String[]
+  daysPerWeek            Int?
+  comfortableSpotting    Boolean  @default(false)
+  strictRoutine          Boolean  @default(false)
+  flexibleSchedule       Boolean  @default(false)
+  createdAt              DateTime @default(now())
+  updatedAt              DateTime @updatedAt
+  user                   User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model Swipe {
@@ -60,9 +143,8 @@ model Swipe {
   toUserId   String
   liked      Boolean
   createdAt  DateTime @default(now())
-
-  fromUser User @relation("SwipeFrom", fields: [fromUserId], references: [id], onDelete: Cascade)
-  toUser   User @relation("SwipeTo", fields: [toUserId], references: [id], onDelete: Cascade)
+  fromUser   User     @relation("SwipeFrom", fields: [fromUserId], references: [id], onDelete: Cascade)
+  toUser     User     @relation("SwipeTo", fields: [toUserId], references: [id], onDelete: Cascade)
 
   @@unique([fromUserId, toUserId])
   @@index([fromUserId])
@@ -70,15 +152,14 @@ model Swipe {
 }
 
 model Match {
-  id        String   @id @default(cuid())
+  id        String    @id @default(cuid())
   user1Id   String
   user2Id   String
-  active    Boolean  @default(true)
-  createdAt DateTime @default(now())
-
-  user1    User      @relation("MatchUser1", fields: [user1Id], references: [id], onDelete: Cascade)
-  user2    User      @relation("MatchUser2", fields: [user2Id], references: [id], onDelete: Cascade)
-  messages Message[]
+  active    Boolean   @default(true)
+  createdAt DateTime  @default(now())
+  user1     User      @relation("MatchUser1", fields: [user1Id], references: [id], onDelete: Cascade)
+  user2     User      @relation("MatchUser2", fields: [user2Id], references: [id], onDelete: Cascade)
+  messages  Message[]
 
   @@unique([user1Id, user2Id])
   @@index([user1Id])
@@ -92,9 +173,8 @@ model Message {
   content   String
   seen      Boolean  @default(false)
   createdAt DateTime @default(now())
-
-  match  Match @relation(fields: [matchId], references: [id], onDelete: Cascade)
-  sender User  @relation(fields: [senderId], references: [id], onDelete: Cascade)
+  match     Match    @relation(fields: [matchId], references: [id], onDelete: Cascade)
+  sender    User     @relation(fields: [senderId], references: [id], onDelete: Cascade)
 
   @@index([matchId])
   @@index([senderId])
@@ -107,8 +187,7 @@ model Notification {
   message   String
   read      Boolean  @default(false)
   createdAt DateTime @default(now())
-
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
 }

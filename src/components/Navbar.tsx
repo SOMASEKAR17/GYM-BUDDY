@@ -1,7 +1,7 @@
 "use client";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { Dumbbell, Search, MessageSquare, User, Settings, Bell, LogOut, RotateCcw, Menu, X as CloseIcon } from "lucide-react";
+import { Dumbbell, Search, MessageSquare, User, Settings, Bell, LogOut, RotateCcw, Menu, X as CloseIcon, Users } from "lucide-react";
 import { useAuthStore } from "@/store/authStore";
 import { useNotificationStore } from "@/store/notificationStore";
 import { useState, useEffect } from "react";
@@ -11,6 +11,7 @@ const NAV_ITEMS = [
   { href: "/discover", icon: <Search size={18} />, label: "Discover" },
   { href: "/matches",  icon: <MessageSquare size={18} />, label: "Matches" },
   { href: "/skipped",  icon: <RotateCcw size={18} />, label: "Skipped" },
+  { href: "/groups",   icon: <Users size={18} />, label: "Groups" },
   { href: "/settings", icon: <Settings size={18} />, label: "Settings" },
 ];
 
