@@ -360,7 +360,26 @@ export default function GroupDashboard() {
                     <input required type="number" className="form-input" placeholder="1" value={prForm.reps} onChange={e => setPrForm({...prForm, reps: e.target.value})} />
                   </div>
                 </div>
-                <button type="submit" disabled={submittingPr} className="btn-primary mt-4 w-full" style={{ padding: "12px" }}>
+
+                {group.members.length < 2 && (
+                  <div className="mt-4 p-3 bg-red-500/10 border border-red-500/20 rounded-lg flex items-start gap-3">
+                    <Info size={16} className="text-accent shrink-0 mt-0.5" />
+                    <p style={{ fontSize: "12px", color: "var(--color-text-secondary)", lineHeight: 1.5 }}>
+                      <strong className="text-accent">Accountability Required:</strong> Your group needs at least 2 members to register PRs. Invite teammates or wait for join requests to be approved.
+                    </p>
+                  </div>
+                )}
+
+                <button 
+                  type="submit" 
+                  disabled={submittingPr || group.members.length < 2} 
+                  className="btn-primary mt-4 w-full" 
+                  style={{ 
+                    padding: "12px",
+                    opacity: group.members.length < 2 ? 0.5 : 1,
+                    cursor: group.members.length < 2 ? "not-allowed" : "pointer"
+                  }}
+                >
                   {submittingPr ? "Submitting..." : "Submit for Verification"}
                 </button>
                 <div className="mt-4 p-4 bg-[rgba(230,57,71,0.05)] border border-[rgba(230,57,71,0.1)] rounded-lg">

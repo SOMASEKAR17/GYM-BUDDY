@@ -21,12 +21,31 @@ export async function GET(req: NextRequest) {
         const swipedIds: string[] = (swiped as any[]).map((s) => s.toUserId as string);
         swipedIds.push(user.id);
 
-        // Get candidates with questionnaire
+        const currentUser = await prisma.user.findUnique({
+            where: { id: user.id },
+            select: { gender: true, gymLocation: true }
+        });
+
+        const isUserOutside = currentUser?.gymLocation?.includes("(Outside)");
+
+        // Base filter
+        const whereClause: any = {
+            id: { notIn: swipedIds },
+            questionnaire: { isNot: null },
+        };
+
+        // Matching logic
+        if (isUserOutside) {
+            whereClause.OR = [
+                { gender: currentUser?.gender },
+                { gymLocation: { contains: "(Outside)" } }
+            ];
+        } else {
+            whereClause.gender = currentUser?.gender;
+        }
+
         const candidates = await prisma.user.findMany({
-            where: {
-                id: { notIn: swipedIds },
-                questionnaire: { isNot: null },
-            },
+            where: whereClause,
             select: {
                 id: true,
                 name: true,

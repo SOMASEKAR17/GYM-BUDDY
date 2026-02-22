@@ -4,15 +4,16 @@ import { usePathname, useRouter } from "next/navigation";
 import { Dumbbell, Search, MessageSquare, User, Settings, Bell, LogOut, RotateCcw, Menu, X as CloseIcon, Users, Trophy } from "lucide-react";
 import { useAuthStore } from "@/store/authStore";
 import { useNotificationStore } from "@/store/notificationStore";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { toast } from "react-hot-toast";
 
 const NAV_ITEMS = [
-  { href: "/discover", icon: <Search size={18} />, label: "Discover" },
-  { href: "/matches",  icon: <MessageSquare size={18} />, label: "Matches" },
-  { href: "/skipped",  icon: <RotateCcw size={18} />, label: "Skipped" },
-  { href: "/groups",   icon: <Users size={18} />, label: "Groups" },
-  { href: "/settings", icon: <Settings size={18} />, label: "Settings" },
+  { href: "/discover",    icon: <Search size={18} />,     label: "Discover" },
+  { href: "/leaderboard", icon: <Trophy size={18} />,    label: "Rankings" },
+  { href: "/matches",     icon: <MessageSquare size={18} />, label: "Matches" },
+  { href: "/skipped",     icon: <RotateCcw size={18} />, label: "Skipped" },
+  { href: "/groups",      icon: <Users size={18} />,       label: "Groups" },
+  { href: "/settings",    icon: <Settings size={18} />,    label: "Settings" },
 ];
 
 export default function Navbar() {
@@ -23,6 +24,30 @@ export default function Navbar() {
   const [showNotif, setShowNotif] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [userGroup, setUserGroup] = useState<any>(null);
+
+  const notifRefDesktop = useRef<HTMLDivElement>(null);
+  const notifRefMobile = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      const isOutsideDesktop = notifRefDesktop.current && !notifRefDesktop.current.contains(event.target as Node);
+      const isOutsideMobile = notifRefMobile.current && !notifRefMobile.current.contains(event.target as Node);
+      
+      if (isOutsideDesktop && isOutsideMobile) {
+        setShowNotif(false);
+      }
+    };
+
+    if (showNotif) {
+      document.addEventListener("mousedown", handleClickOutside);
+    } else {
+      document.removeEventListener("mousedown", handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [showNotif]);
 
   useEffect(() => {
     fetch("/api/notifications")
@@ -61,7 +86,8 @@ export default function Navbar() {
 
   const handleLogout = () => {
     logout();
-    router.push("/");
+    toast.success("Logged out successfully");
+    router.push("/login");
   };
 
   // Close menu when navigating
@@ -78,7 +104,7 @@ export default function Navbar() {
           left: 0,
           right: 0,
           zIndex: 100,
-          background: "rgba(13,13,13,0.92)",
+          background: "rgba(13, 13, 13, 0.25)",
           backdropFilter: "blur(20px)",
           borderBottom: "1px solid var(--color-border-subtle)",
           height: "64px",
@@ -129,7 +155,7 @@ export default function Navbar() {
           })}
 
           {/* Notifications */}
-          <div style={{ position: "relative" }}>
+          <div ref={notifRefDesktop} style={{ position: "relative" }}>
             <button
               id="notif-btn"
               onClick={() => setShowNotif(!showNotif)}
@@ -275,7 +301,7 @@ export default function Navbar() {
         {/* Mobile Controls */}
         <div className="flex md:hidden items-center gap-3">
           {/* Mobile Notifications */}
-          <div style={{ position: "relative" }}>
+          <div ref={notifRefMobile} style={{ position: "relative" }}>
             <button
               onClick={() => setShowNotif(!showNotif)}
               style={{
@@ -394,7 +420,7 @@ export default function Navbar() {
             left: 0,
             right: 0,
             bottom: 0,
-            background: "rgba(13,13,13,0.98)",
+            background: "rgba(13, 13, 13, 0)",
             backdropFilter: "blur(15px)",
             overflowY:"scroll",
             zIndex: 90,

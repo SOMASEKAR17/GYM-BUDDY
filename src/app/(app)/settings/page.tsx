@@ -5,19 +5,33 @@ import { useAuthStore } from "@/store/authStore";
 import { toast } from "react-hot-toast";
 import { 
   LogOut, Trash2, Shield, Bell, ChevronRight, Camera, Save, 
-  Dumbbell, Target, MapPin, Calendar, User as UserIcon 
+  Dumbbell, Target, MapPin, Calendar, User as UserIcon, Clock, Users
 } from "lucide-react";
 
-const GYM_LOCATIONS = [
-  "Fitty New (Mens)", "Fitty Old (Mens)", "Outdoor Gym (Mens)", "Indoor Gym (Mens)", "Trendset Gym (Mens)",
-  "Girls Gym",
-  "Infinity Fitness (Outside)", "Muscle Engineer (Outside)", "IMMC Fit Club (Outside)", "Stay Fit (Outside)", "AJ Fitness (Outside)"
-];
+const MENS_GYMS     = ["Fitty New (Mens)", "Fitty Old (Mens)", "Outdoor Gym (Mens)", "Indoor Gym (Mens)", "Trendset Gym (Mens)"];
+const GIRLS_GYMS    = ["Girls Gym"];
+const OUTSIDE_GYMS  = ["Infinity Fitness (Outside)", "Muscle Engineer (Outside)", "IMMC Fit Club (Outside)", "Stay Fit (Outside)", "AJ Fitness (Outside)"];
+const GYM_LOCATIONS = [...MENS_GYMS, ...GIRLS_GYMS, ...OUTSIDE_GYMS];
+
 const LEVELS        = ["Beginner", "Intermediate", "Advanced"];
 const GOALS         = ["Muscle Gain", "Fat Loss", "Strength", "General Fitness", "Athletic Performance"];
 const GENDERS       = ["Male", "Female", "Non-binary", "Prefer not to say"];
-const COURSES       = ["B.Tech", "M.Tech", "MBA", "MCA", "BCA", "PhD"];
-const YEARS         = ["1st Year", "2nd Year", "3rd Year", "4th Year", "5th Year"];
+const COURSES       = ["B.Tech", "M.Tech","M.Tech-Integrated", "MBA", "MCA", "BCA", "PhD"];
+const COURSE_YEARS: Record<string, number> = {
+  "B.Tech": 4,
+  "M.Tech": 2,
+  "M.Tech-Integrated":5,
+  "MBA": 2,
+  "MCA": 2,
+  "BCA": 3,
+  "PhD": 5,
+};
+
+const WORKOUT_TIMES = ["Morning (6 AM - 9 AM)", "Afternoon (3 PM - 5 PM)", "Evening (5 PM - 8 PM)", "Full Time (Outside VIT)"];
+const DURATIONS     = ["45 min", "1 hour", "1.5 hours", "2 hours", "2+ hours"];
+const SPLITS        = ["Push Pull Legs", "Bro Split", "Upper / Lower", "Full Body", "Custom"];
+const STYLES        = ["Heavy Lifting", "Hypertrophy", "Functional Training", "Cardio-Focused", "Mixed"];
+const TRAITS        = ["Same Experience Level", "More Experienced Partner", "Same Timing", "Strict Routine", "High Intensity", "Motivating Partner"];
 
 export default function SettingsPage() {
   const router = useRouter();
@@ -38,6 +52,16 @@ export default function SettingsPage() {
     fitnessGoal:  user?.fitnessGoal  || "",
     course:       user?.course       || "",
     year:         user?.year         || "",
+    // Questionnaire fields
+    workoutTime:     (user?.questionnaire as any)?.workoutTime || "",
+    workoutDuration: (user?.questionnaire as any)?.workoutDuration || "",
+    workoutSplit:    (user?.questionnaire as any)?.workoutSplit || "",
+    trainingStyle:   (user?.questionnaire as any)?.trainingStyle || "",
+    daysPerWeek:     (user?.questionnaire as any)?.daysPerWeek || 4,
+    preferredPartnerTraits: (user?.questionnaire as any)?.preferredPartnerTraits || [] as string[],
+    comfortableSpotting: (user?.questionnaire as any)?.comfortableSpotting || false,
+    strictRoutine: (user?.questionnaire as any)?.strictRoutine || false,
+    flexibleSchedule: (user?.questionnaire as any)?.flexibleSchedule || false,
   });
 
   useEffect(() => {
@@ -52,23 +76,100 @@ export default function SettingsPage() {
         fitnessGoal:  user.fitnessGoal  || "",
         course:       user.course       || "",
         year:         user.year         || "",
+        workoutTime:     (user.questionnaire as any)?.workoutTime || "",
+        workoutDuration: (user.questionnaire as any)?.workoutDuration || "",
+        workoutSplit:    (user.questionnaire as any)?.workoutSplit || "",
+        trainingStyle:   (user.questionnaire as any)?.trainingStyle || "",
+        daysPerWeek:     (user.questionnaire as any)?.daysPerWeek || 4,
+        preferredPartnerTraits: (user.questionnaire as any)?.preferredPartnerTraits || [],
+        comfortableSpotting: (user.questionnaire as any)?.comfortableSpotting || false,
+        strictRoutine: (user.questionnaire as any)?.strictRoutine || false,
+        flexibleSchedule: (user.questionnaire as any)?.flexibleSchedule || false,
       });
     }
   }, [user]);
 
+  const toggleTrait = (t: string) => {
+    setForm(prev => ({
+      ...prev,
+      preferredPartnerTraits: prev.preferredPartnerTraits.includes(t) 
+        ? prev.preferredPartnerTraits.filter(x => x !== t) 
+        : [...prev.preferredPartnerTraits, t]
+    }));
+  };
+
+  const getOrdinal = (n: number) => {
+    const s = ["th", "st", "nd", "rd"];
+    const v = n % 100;
+    return s[(v - 20) % 10] || s[v] || s[0];
+  };
+
+  const getYearOptions = () => {
+    const maxYears = COURSE_YEARS[form.course as keyof typeof COURSE_YEARS];
+    if (!maxYears) return []; 
+    return Array.from({ length: maxYears }, (_, i) => `${i + 1}${getOrdinal(i + 1)} Year`);
+  };
+
+  const handleCourseChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const newCourse = e.target.value;
+    const maxYearsForNewCourse = COURSE_YEARS[newCourse as keyof typeof COURSE_YEARS];
+    const currentYearNumber = parseInt(form.year.split(' ')[0]);
+
+    setForm(prevForm => {
+      let newYear = prevForm.year;
+      if (maxYearsForNewCourse && currentYearNumber > maxYearsForNewCourse) {
+        newYear = ""; 
+      } else if (!maxYearsForNewCourse) {
+        newYear = ""; 
+      }
+      return { ...prevForm, course: newCourse, year: newYear };
+    });
+  };
+
   const handleSaveProfile = async () => {
     setSaveLoading(true);
     try {
-      const res = await fetch("/api/user/profile", {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...form, age: form.age ? parseInt(form.age) : undefined }),
-      });
-      const data = await res.json();
-      if (!res.ok) { toast.error(data.error); return; }
-      setUser({ ...user!, ...data.user });
-      toast.success("Profile updated! ✅");
-    } catch {
+      const { 
+        workoutTime, workoutDuration, workoutSplit, trainingStyle, 
+        daysPerWeek, preferredPartnerTraits, comfortableSpotting, 
+        strictRoutine, flexibleSchedule, ...profileData 
+      } = form;
+
+      const [profileRes, qRes] = await Promise.all([
+        fetch("/api/user/profile", {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ ...profileData, age: profileData.age ? parseInt(profileData.age) : undefined }),
+        }),
+        fetch("/api/user/questionnaire", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ 
+            workoutTime, workoutDuration, workoutSplit, trainingStyle, 
+            daysPerWeek, preferredPartnerTraits, comfortableSpotting, 
+            strictRoutine, flexibleSchedule 
+          }),
+        })
+      ]);
+
+      if (!profileRes.ok || !qRes.ok) {
+        toast.error("Failed to update profile");
+        return;
+      }
+
+      const profileJson = await profileRes.json();
+      const qJson = await qRes.json();
+
+      if (profileRes.ok && qRes.ok) {
+        setUser({ 
+          ...user!, 
+          ...profileJson.user, 
+          questionnaire: qJson.questionnaire 
+        });
+        toast.success("Profile updated! ✅");
+      }
+    } catch (error) {
+      console.error("Save error:", error);
       toast.error("Failed to update profile");
     } finally {
       setSaveLoading(false);
@@ -78,7 +179,7 @@ export default function SettingsPage() {
   const handleLogout = () => {
     logout();
     toast.success("Logged out successfully");
-    router.push("/");
+    router.push("/login");
   };
 
   const handleDeleteAccount = async () => {
@@ -94,7 +195,7 @@ export default function SettingsPage() {
 
       toast.success("Account deleted successfully. We'll miss you! 👋");
       logout();
-      router.push("/");
+      router.push("/login");
     } catch {
       toast.error("Something went wrong");
     } finally {
@@ -160,6 +261,7 @@ export default function SettingsPage() {
       <button
         type="button"
         onClick={onClick}
+        className="truncate"
         style={{
           padding: "8px 12px",
           background: active ? "rgba(230,57,70,0.15)" : "rgba(255,255,255,0.03)",
@@ -315,7 +417,7 @@ export default function SettingsPage() {
                 <Field label="Course">
                   <select
                     className="form-input" value={form.course}
-                    onChange={(e) => setForm({ ...form, course: e.target.value })}
+                    onChange={handleCourseChange}
                     style={{ backgroundColor: "#1a1a1a", color: "white" }}
                   >
                     <option value="">Select</option>
@@ -329,7 +431,7 @@ export default function SettingsPage() {
                     style={{ backgroundColor: "#1a1a1a", color: "white" }}
                   >
                     <option value="">Select</option>
-                    {YEARS.map(y => <option key={y}>{y}</option>)}
+                    {getYearOptions().map(y => <option key={y}>{y}</option>)}
                   </select>
                 </Field>
               </div>
@@ -359,8 +461,13 @@ export default function SettingsPage() {
             
             <div className="flex flex-col gap-6">
               <Field label="Gym Location">
-                <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
-                  {GYM_LOCATIONS.map(g => (
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
+                  {(form.gender === "Male" 
+                    ? [...MENS_GYMS, ...OUTSIDE_GYMS] 
+                    : form.gender === "Female" 
+                      ? [...GIRLS_GYMS, ...OUTSIDE_GYMS] 
+                      : GYM_LOCATIONS
+                  ).map(g => (
                     <SelectChip key={g} value={g} current={form.gymLocation} onClick={() => setForm({ ...form, gymLocation: g })} />
                   ))}
                 </div>
@@ -378,6 +485,124 @@ export default function SettingsPage() {
                 <div className="flex flex-wrap gap-2">
                   {GOALS.map(g => (
                     <SelectChip key={g} value={g} current={form.fitnessGoal} onClick={() => setForm({ ...form, fitnessGoal: g })} />
+                  ))}
+                </div>
+              </Field>
+            </div>
+          </div>
+
+          <div className="glass-card" style={{ padding: "24px" }}>
+            <h2 style={{ fontFamily: "var(--font-heading)", fontSize: "16px", marginBottom: "20px", display: "flex", alignItems: "center", gap: "8px" }}>
+              <Clock size={18} color="var(--color-accent)" /> WORKOUT PREFERENCES
+            </h2>
+            
+            <div className="flex flex-col gap-6">
+              <Field label="Workout Time">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                  {WORKOUT_TIMES.map(t => (
+                    <SelectChip key={t} value={t} current={form.workoutTime} onClick={() => setForm({ ...form, workoutTime: t })} />
+                  ))}
+                </div>
+              </Field>
+
+              <Field label="Session Duration">
+                <div className="flex flex-wrap gap-2">
+                  {DURATIONS.map(d => (
+                    <SelectChip key={d} value={d} current={form.workoutDuration} onClick={() => setForm({ ...form, workoutDuration: d })} />
+                  ))}
+                </div>
+              </Field>
+
+              <Field label="Workout Split">
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                  {SPLITS.map(s => (
+                    <SelectChip key={s} value={s} current={form.workoutSplit} onClick={() => setForm({ ...form, workoutSplit: s })} />
+                  ))}
+                </div>
+              </Field>
+
+              <Field label="Training Style">
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                  {STYLES.map(s => (
+                    <SelectChip key={s} value={s} current={form.trainingStyle} onClick={() => setForm({ ...form, trainingStyle: s })} />
+                  ))}
+                </div>
+              </Field>
+
+              <Field label={`Days per week: ${form.daysPerWeek}`}>
+                <input 
+                  type="range" min={1} max={7} 
+                  value={form.daysPerWeek}
+                  onChange={(e) => setForm({ ...form, daysPerWeek: parseInt(e.target.value) })}
+                  style={{ width: "100%", accentColor: "var(--color-accent)" }} 
+                />
+                <div style={{ display: "flex", justifyContent: "space-between", fontSize: "10px", color: "var(--color-text-muted)", marginTop: "4px" }}>
+                  <span>1 day</span><span>7 days</span>
+                </div>
+              </Field>
+            </div>
+          </div>
+
+          <div className="glass-card" style={{ padding: "24px" }}>
+            <h2 style={{ fontFamily: "var(--font-heading)", fontSize: "16px", marginBottom: "20px", display: "flex", alignItems: "center", gap: "8px" }}>
+              <Users size={18} color="var(--color-accent)" /> PARTNER PREFERENCES
+            </h2>
+            
+            <div className="flex flex-col gap-6">
+              <Field label="Preferred Partner Traits">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                  {TRAITS.map(t => (
+                    <button
+                      key={t}
+                      type="button"
+                      onClick={() => toggleTrait(t)}
+                      style={{
+                        padding: "8px 12px",
+                        background: form.preferredPartnerTraits.includes(t) ? "rgba(230,57,70,0.15)" : "rgba(255,255,255,0.03)",
+                        border: `1.5px solid ${form.preferredPartnerTraits.includes(t) ? "var(--color-accent)" : "var(--color-border-subtle)"}`,
+                        borderRadius: "8px",
+                        color: form.preferredPartnerTraits.includes(t) ? "var(--color-accent)" : "var(--color-text-secondary)",
+                        fontSize: "12px",
+                        fontWeight: form.preferredPartnerTraits.includes(t) ? 600 : 400,
+                        cursor: "pointer",
+                        transition: "all 0.15s",
+                        textAlign: "left"
+                      }}
+                    >
+                      {t}
+                    </button>
+                  ))}
+                </div>
+              </Field>
+
+              <Field label="I'm comfortable with">
+                <div className="flex flex-col gap-2">
+                  {[
+                    { key: "comfortableSpotting", label: "Spotting heavy lifts" },
+                    { key: "strictRoutine", label: "Strict routine adherence" },
+                    { key: "flexibleSchedule", label: "Flexible / changeable schedule" },
+                  ].map(({ key, label }) => (
+                    <label
+                      key={key}
+                      style={{ 
+                        display: "flex", 
+                        alignItems: "center", 
+                        gap: "12px", 
+                        cursor: "pointer", 
+                        padding: "10px 14px", 
+                        background: "rgba(255,255,255,0.02)", 
+                        borderRadius: "8px", 
+                        border: "1px solid var(--color-border-subtle)" 
+                      }}
+                    >
+                      <input
+                        type="checkbox"
+                        checked={(form as any)[key]}
+                        onChange={(e) => setForm({ ...form, [key]: e.target.checked })}
+                        style={{ accentColor: "var(--color-accent)", width: "16px", height: "16px" }}
+                      />
+                      <span style={{ fontSize: "13px", color: "var(--color-text-secondary)" }}>{label}</span>
+                    </label>
                   ))}
                 </div>
               </Field>
