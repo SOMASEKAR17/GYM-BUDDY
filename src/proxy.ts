@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import { verifyToken } from "@/lib/jwt";
 
-const protectedRoutes = ["/discover", "/matches", "/chat", "/profile", "/settings"];
+const protectedRoutes = ["/discover", "/matches", "/chat", "/settings"];
 const authRoutes = ["/login", "/register"];
 
 export function proxy(request: NextRequest) {

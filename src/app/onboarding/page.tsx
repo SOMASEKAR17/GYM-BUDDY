@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "react-hot-toast";
 import { Dumbbell, CheckCircle2 } from "lucide-react";
@@ -23,9 +23,15 @@ const GENDERS = ["Male", "Female", "Non-binary", "Prefer not to say"];
 
 export default function OnboardingPage() {
   const router = useRouter();
-  const { user, setUser } = useAuthStore();
+  const { user, setUser, isHydrated } = useAuthStore();
   const [step, setStep] = useState(0);
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    if (isHydrated && !user) {
+      router.push("/login");
+    }
+  }, [user, isHydrated, router]);
 
   const [profile, setProfile] = useState({
     age: "", gender: "", bio: "", gymLocation: "", fitnessLevel: "", fitnessGoal: "",

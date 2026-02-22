@@ -1,7 +1,7 @@
 "use client";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { Dumbbell, Search, MessageSquare, User, Settings, Bell, LogOut, RotateCcw, Menu, X as CloseIcon } from "lucide-react";
+import { Dumbbell, Search, MessageSquare, User, Settings, Bell, LogOut, RotateCcw, Menu, X as CloseIcon, Users, Trophy } from "lucide-react";
 import { useAuthStore } from "@/store/authStore";
 import { useNotificationStore } from "@/store/notificationStore";
 import { useState, useEffect } from "react";
@@ -11,7 +11,7 @@ const NAV_ITEMS = [
   { href: "/discover", icon: <Search size={18} />, label: "Discover" },
   { href: "/matches",  icon: <MessageSquare size={18} />, label: "Matches" },
   { href: "/skipped",  icon: <RotateCcw size={18} />, label: "Skipped" },
-  { href: "/profile",  icon: <User size={18} />, label: "Profile" },
+  { href: "/groups",   icon: <Users size={18} />, label: "Groups" },
   { href: "/settings", icon: <Settings size={18} />, label: "Settings" },
 ];
 
@@ -22,13 +22,31 @@ export default function Navbar() {
   const { unreadCount, setNotifications, markAsRead, markAllAsRead, notifications } = useNotificationStore();
   const [showNotif, setShowNotif] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [userGroup, setUserGroup] = useState<any>(null);
 
   useEffect(() => {
     fetch("/api/notifications")
       .then((r) => r.json())
       .then((d) => { if (d.notifications) setNotifications(d.notifications); })
       .catch(() => {});
+    
+    // Check group status
+    fetch("/api/groups/my-group")
+      .then(r => r.json())
+      .then(d => setUserGroup(d.group))
+      .catch(() => {});
   }, [setNotifications]);
+
+  const navItems = [...NAV_ITEMS];
+  if (userGroup) {
+    // Insert Group Dashboard before Settings
+    const settingsIdx = navItems.findIndex(i => i.href === "/settings");
+    navItems.splice(settingsIdx, 0, { 
+      href: "/groups/dashboard", 
+      icon: <Trophy size={18} />, 
+      label: "Group CRM" 
+    });
+  }
 
   const refreshNotifications = async () => {
     try {
@@ -83,8 +101,8 @@ export default function Navbar() {
 
         {/* Desktop Nav items */}
         <div className="hidden md:flex items-center gap-1">
-          {NAV_ITEMS.map((item) => {
-            const active = pathname.startsWith(item.href);
+          {navItems.map((item) => {
+            const active = item.href === "/groups" ? pathname === "/groups" : pathname.startsWith(item.href);
             return (
               <Link
                 key={item.href}
@@ -217,7 +235,9 @@ export default function Navbar() {
                 width: "32px",
                 height: "32px",
                 borderRadius: "50%",
-                background: "linear-gradient(135deg, var(--color-accent), var(--color-accent-dark))",
+                background: user?.profileImage ? `url(${user.profileImage})` : "linear-gradient(135deg, var(--color-accent), var(--color-accent-dark))",
+                backgroundSize: "cover",
+                backgroundPosition: "center",
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
@@ -225,7 +245,7 @@ export default function Navbar() {
                 flexShrink: 0,
               }}
             >
-              <User size={18} />
+              {!user?.profileImage && <User size={18} />}
             </div>
             <button
               id="logout-btn"
@@ -376,6 +396,7 @@ export default function Navbar() {
             bottom: 0,
             background: "rgba(13,13,13,0.98)",
             backdropFilter: "blur(15px)",
+            overflowY:"scroll",
             zIndex: 90,
             padding: "24px",
             display: "flex",
@@ -384,7 +405,7 @@ export default function Navbar() {
           }}
           className="md:hidden fade-in"
         >
-          {NAV_ITEMS.map((item) => {
+          {navItems.map((item) => {
             const active = pathname === item.href;
             return (
               <Link
@@ -419,14 +440,16 @@ export default function Navbar() {
                   width: "48px",
                   height: "48px",
                   borderRadius: "50%",
-                  background: "linear-gradient(135deg, var(--color-accent), var(--color-accent-dark))",
+                  background: user?.profileImage ? `url(${user.profileImage})` : "linear-gradient(135deg, var(--color-accent), var(--color-accent-dark))",
+                  backgroundSize: "cover",
+                  backgroundPosition: "center",
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
                   color: "white",
                 }}
               >
-                <User size={24} />
+                {!user?.profileImage && <User size={24} />}
               </div>
               <div>
                 <div style={{ fontSize: "16px", fontWeight: 700, color: "white" }}>{user?.name}</div>

@@ -2,6 +2,7 @@
 import { useState, useEffect, useRef } from "react";
 import { toast } from "react-hot-toast";
 import { X, Heart, Dumbbell, Clock, Target, Star, MapPin, ChevronLeft, ChevronRight, User } from "lucide-react";
+import { useAuthStore } from "@/store/authStore";
 
 interface Candidate {
   id: string;
@@ -26,6 +27,7 @@ interface Candidate {
 }
 
 export default function DiscoverPage() {
+  const { user } = useAuthStore();
   const [candidates, setCandidates] = useState<Candidate[]>([]);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [loading, setLoading] = useState(true);
@@ -162,14 +164,38 @@ export default function DiscoverPage() {
           position: "fixed", inset: 0, zIndex: 1000, display: "flex", alignItems: "center", justifyContent: "center",
           background: "rgba(0,0,0,0.85)", backdropFilter: "blur(8px)"
         }}>
-          <div className="fade-in" style={{ textAlign: "center" }}>
-            <div style={{ fontSize: "80px", marginBottom: "16px", animation: "pulse-red 1s infinite" }}>🎉</div>
-            <h2 style={{ fontFamily: "var(--font-heading)", fontSize: "48px", fontWeight: 700, marginBottom: "8px" }}>
+          <div className="fade-in" style={{ textAlign: "center", maxWidth: "400px", padding: "0 20px" }}>
+            <div className="flex items-center justify-center gap-4 mb-6">
+              <div style={{ 
+                width: 80, height: 80, borderRadius: "50%", 
+                background: user?.profileImage ? `url(${user.profileImage})` : "linear-gradient(135deg, var(--color-accent), var(--color-accent-dark))",
+                backgroundSize: "cover", backgroundPosition: "center",
+                border: "3px solid white", boxShadow: "0 0 20px rgba(230,57,70,0.5)"
+              }}>
+                {!user?.profileImage && <User size={40} color="white" />}
+              </div>
+              <div style={{ fontSize: "32px" }}>❤️</div>
+              <div style={{ 
+                width: 80, height: 80, borderRadius: "50%", 
+                background: current?.profileImage ? `url(${current.profileImage})` : "linear-gradient(135deg, var(--color-accent), var(--color-accent-dark))",
+                backgroundSize: "cover", backgroundPosition: "center",
+                border: "3px solid white", boxShadow: "0 0 20px rgba(230,57,70,0.5)"
+              }}>
+                {!current?.profileImage && <User size={40} color="white" />}
+              </div>
+            </div>
+            <h2 style={{ fontFamily: "var(--font-heading)", fontSize: "40px", fontWeight: 700, marginBottom: "8px" }}>
               IT&apos;S A <span className="text-gradient">MATCH!</span>
             </h2>
-            <p style={{ color: "var(--color-text-secondary)", fontSize: "16px" }}>
-              You and {current?.name} both liked each other. Start chatting!
+            <p style={{ color: "var(--color-text-secondary)", fontSize: "16px", lineHeight: 1.5 }}>
+              You and {current?.name} both liked each other. Head over to matches to start chatting!
             </p>
+            <button 
+              className="btn-primary mt-8 w-full" 
+              onClick={() => setMatchAnimation(false)}
+            >
+              Keep Swiping
+            </button>
           </div>
         </div>
       )}
@@ -197,8 +223,14 @@ export default function DiscoverPage() {
             <div className="glass-card hidden md:block" style={{ padding: "16px", opacity: 0.6 }}>
               <p style={{ fontSize: "12px", color: "var(--color-text-muted)", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: "8px" }}>Up next</p>
               <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
-                <div style={{ width: 36, height: 36, borderRadius: "50%", background: "linear-gradient(135deg, #333, #555)", display: "flex", alignItems: "center", justifyContent: "center", color: "white" }}>
-                  <User size={18} />
+                <div style={{ 
+                  width: 36, height: 36, borderRadius: "50%", 
+                  background: next.profileImage ? `url(${next.profileImage})` : "linear-gradient(135deg, #333, #555)", 
+                  backgroundSize: "cover",
+                  backgroundPosition: "center",
+                  display: "flex", alignItems: "center", justifyContent: "center", color: "white" 
+                }}>
+                  {!next.profileImage && <User size={18} />}
                 </div>
                 <div>
                   <div style={{ fontWeight: 600, fontSize: "14px" }}>{next.name}</div>
@@ -274,14 +306,16 @@ export default function DiscoverPage() {
                 width: 100,
                 height: 100,
                 borderRadius: "50%",
-                background: "linear-gradient(135deg, var(--color-accent), var(--color-accent-dark))",
+                background: current.profileImage ? `url(${current.profileImage})` : "linear-gradient(135deg, var(--color-accent), var(--color-accent-dark))",
+                backgroundSize: "cover",
+                backgroundPosition: "center",
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
                 color: "white",
                 boxShadow: "0 0 32px rgba(230,57,70,0.4)",
               }}>
-                <User size={48} />
+                {!current.profileImage && <User size={48} />}
               </div>
 
               {/* Compatibility badge */}
