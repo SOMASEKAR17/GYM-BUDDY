@@ -6,10 +6,11 @@ import { toast } from "react-hot-toast";
 import { Dumbbell, Eye, EyeOff } from "lucide-react";
 import { useAuthStore } from "@/store/authStore";
 
-const COURSES = ["B.Tech", "M.Tech", "MBA", "MCA", "BCA", "PhD"];
+const COURSES = ["B.Tech", "M.Tech", "M.Tech-Integrated", "MBA", "MCA", "BCA", "PhD"];
 const COURSE_YEARS: Record<string, number> = {
   "B.Tech": 4,
   "M.Tech": 2,
+  "M.Tech-Integrated": 5,
   "MBA": 2,
   "MCA": 2,
   "BCA": 3,

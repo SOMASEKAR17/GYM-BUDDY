@@ -16,7 +16,7 @@ const GYM_LOCATIONS = [...MENS_GYMS, ...GIRLS_GYMS, ...OUTSIDE_GYMS];
 const LEVELS        = ["Beginner", "Intermediate", "Advanced"];
 const GOALS         = ["Muscle Gain", "Fat Loss", "Strength", "General Fitness", "Athletic Performance"];
 const GENDERS       = ["Male", "Female", "Non-binary", "Prefer not to say"];
-const COURSES       = ["B.Tech", "M.Tech", "MBA", "MCA", "BCA", "PhD"];
+const COURSES       = ["B.Tech", "M.Tech","M.Tech-Integrated", "MBA", "MCA", "BCA", "PhD"];
 const COURSE_YEARS: Record<string, number> = {
   "B.Tech": 4,
   "M.Tech": 2,
