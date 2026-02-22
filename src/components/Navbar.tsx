@@ -396,6 +396,7 @@ export default function Navbar() {
             bottom: 0,
             background: "rgba(13,13,13,0.98)",
             backdropFilter: "blur(15px)",
+            overflowY:"scroll",
             zIndex: 90,
             padding: "24px",
             display: "flex",

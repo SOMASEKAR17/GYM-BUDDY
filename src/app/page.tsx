@@ -110,13 +110,12 @@ export default function LandingPage() {
 
         {/* Mobile menu toggle */}
         <button
-          className="md:hidden p-2 text-white"
+          className="flex md:hidden p-2 text-white"
           onClick={() => setIsMenuOpen(!isMenuOpen)}
           style={{
             background: isMenuOpen ? "rgba(230,57,71,0.2)" : "rgba(255,255,255,0.05)",
             border: `1px solid ${isMenuOpen ? "var(--color-accent)" : "rgba(255,255,255,0.1)"}`,
             borderRadius: "8px",
-            display: "flex",
             alignItems: "center",
             justifyContent: "center",
             width: "40px",
