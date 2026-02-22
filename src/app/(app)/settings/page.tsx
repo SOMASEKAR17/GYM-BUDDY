@@ -8,11 +8,11 @@ import {
   Dumbbell, Target, MapPin, Calendar, User as UserIcon, Clock, Users
 } from "lucide-react";
 
-const GYM_LOCATIONS = [
-  "Fitty New (Mens)", "Fitty Old (Mens)", "Outdoor Gym (Mens)", "Indoor Gym (Mens)", "Trendset Gym (Mens)",
-  "Girls Gym",
-  "Infinity Fitness (Outside)", "Muscle Engineer (Outside)", "IMMC Fit Club (Outside)", "Stay Fit (Outside)", "AJ Fitness (Outside)"
-];
+const MENS_GYMS     = ["Fitty New (Mens)", "Fitty Old (Mens)", "Outdoor Gym (Mens)", "Indoor Gym (Mens)", "Trendset Gym (Mens)"];
+const GIRLS_GYMS    = ["Girls Gym"];
+const OUTSIDE_GYMS  = ["Infinity Fitness (Outside)", "Muscle Engineer (Outside)", "IMMC Fit Club (Outside)", "Stay Fit (Outside)", "AJ Fitness (Outside)"];
+const GYM_LOCATIONS = [...MENS_GYMS, ...GIRLS_GYMS, ...OUTSIDE_GYMS];
+
 const LEVELS        = ["Beginner", "Intermediate", "Advanced"];
 const GOALS         = ["Muscle Gain", "Fat Loss", "Strength", "General Fitness", "Athletic Performance"];
 const GENDERS       = ["Male", "Female", "Non-binary", "Prefer not to say"];
@@ -424,8 +424,13 @@ export default function SettingsPage() {
             
             <div className="flex flex-col gap-6">
               <Field label="Gym Location">
-                <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
-                  {GYM_LOCATIONS.map(g => (
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
+                  {(form.gender === "Male" 
+                    ? [...MENS_GYMS, ...OUTSIDE_GYMS] 
+                    : form.gender === "Female" 
+                      ? [...GIRLS_GYMS, ...OUTSIDE_GYMS] 
+                      : GYM_LOCATIONS
+                  ).map(g => (
                     <SelectChip key={g} value={g} current={form.gymLocation} onClick={() => setForm({ ...form, gymLocation: g })} />
                   ))}
                 </div>

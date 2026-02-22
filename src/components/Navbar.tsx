@@ -86,6 +86,7 @@ export default function Navbar() {
 
   const handleLogout = () => {
     logout();
+    toast.success("Logged out successfully");
     router.push("/login");
   };
 

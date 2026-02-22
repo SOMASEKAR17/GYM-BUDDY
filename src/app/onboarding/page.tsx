@@ -7,11 +7,11 @@ import { useAuthStore } from "@/store/authStore";
 
 const STEPS = ["Profile Info", "Workout Preferences", "Partner Traits"];
 
-const GYM_LOCATIONS = [
-  "Fitty New (Mens)", "Fitty Old (Mens)", "Outdoor Gym (Mens)", "Indoor Gym (Mens)", "Trendset Gym (Mens)",
-  "Girls Gym",
-  "Infinity Fitness (Outside)", "Muscle Engineer (Outside)", "IMMC Fit Club (Outside)", "Stay Fit (Outside)", "AJ Fitness (Outside)"
-];
+const MENS_GYMS     = ["Fitty New (Mens)", "Fitty Old (Mens)", "Outdoor Gym (Mens)", "Indoor Gym (Mens)", "Trendset Gym (Mens)"];
+const GIRLS_GYMS    = ["Girls Gym"];
+const OUTSIDE_GYMS  = ["Infinity Fitness (Outside)", "Muscle Engineer (Outside)", "IMMC Fit Club (Outside)", "Stay Fit (Outside)", "AJ Fitness (Outside)"];
+const GYM_LOCATIONS = [...MENS_GYMS, ...GIRLS_GYMS, ...OUTSIDE_GYMS];
+
 const WORKOUT_TIMES = ["Morning (6 AM - 9 AM)", "Afternoon (3 PM - 5 PM)", "Evening (5 PM - 8 PM)", "Full Time (Outside VIT)"];
 const DURATIONS = ["45 min", "1 hour", "1.5 hours", "2 hours", "2+ hours"];
 const SPLITS = ["Push Pull Legs", "Bro Split", "Upper / Lower", "Full Body", "Custom"];
@@ -149,7 +149,12 @@ export default function OnboardingPage() {
               <div>
                 <label style={{ fontSize: "12px", color: "var(--color-text-secondary)", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.06em", display: "block", marginBottom: "8px" }}>Gym Location</label>
                 <div style={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: "8px" }}>
-                  {GYM_LOCATIONS.map((g) => (
+                  {(profile.gender === "Male" 
+                    ? [...MENS_GYMS, ...OUTSIDE_GYMS] 
+                    : profile.gender === "Female" 
+                      ? [...GIRLS_GYMS, ...OUTSIDE_GYMS] 
+                      : GYM_LOCATIONS
+                  ).map((g) => (
                     <SelectCard key={g} value={g} selected={profile.gymLocation === g} onClick={() => setProfile({ ...profile, gymLocation: g })}>{g}</SelectCard>
                   ))}
                 </div>
