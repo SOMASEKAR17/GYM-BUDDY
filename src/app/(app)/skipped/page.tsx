@@ -16,6 +16,7 @@ interface SkippedProfile {
   gymLocation?: string;
   fitnessLevel?: string;
   fitnessGoal?: string;
+  profileImage?: string;
   course?: string;
   year?: string;
   compatibilityScore: number;
@@ -301,7 +302,9 @@ export default function SkippedPage() {
                         width: 56,
                         height: 56,
                         borderRadius: "50%",
-                        background: "linear-gradient(135deg, #E63946, #C1121F)",
+                        background: profile.profileImage 
+                          ? `url(${profile.profileImage}) center/cover no-repeat` 
+                          : "linear-gradient(135deg, #E63946, #C1121F)",
                         display: "flex",
                         alignItems: "center",
                         justifyContent: "center",
@@ -310,9 +313,10 @@ export default function SkippedPage() {
                         fontWeight: 700,
                         color: "white",
                         boxShadow: "0 0 20px rgba(230,57,70,0.35)",
+                        border: "2px solid rgba(255,255,255,0.1)",
                       }}
                     >
-                      {avatarLetter}
+                      {!profile.profileImage && avatarLetter}
                     </div>
 
                     {/* Match % badge */}
