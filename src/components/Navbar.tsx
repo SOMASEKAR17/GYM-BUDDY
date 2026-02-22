@@ -8,11 +8,12 @@ import { useState, useEffect, useRef } from "react";
 import { toast } from "react-hot-toast";
 
 const NAV_ITEMS = [
-  { href: "/discover", icon: <Search size={18} />, label: "Discover" },
-  { href: "/matches",  icon: <MessageSquare size={18} />, label: "Matches" },
-  { href: "/skipped",  icon: <RotateCcw size={18} />, label: "Skipped" },
-  { href: "/groups",   icon: <Users size={18} />, label: "Groups" },
-  { href: "/settings", icon: <Settings size={18} />, label: "Settings" },
+  { href: "/discover",    icon: <Search size={18} />,     label: "Discover" },
+  { href: "/leaderboard", icon: <Trophy size={18} />,    label: "Rankings" },
+  { href: "/matches",     icon: <MessageSquare size={18} />, label: "Matches" },
+  { href: "/skipped",     icon: <RotateCcw size={18} />, label: "Skipped" },
+  { href: "/groups",      icon: <Users size={18} />,       label: "Groups" },
+  { href: "/settings",    icon: <Settings size={18} />,    label: "Settings" },
 ];
 
 export default function Navbar() {
