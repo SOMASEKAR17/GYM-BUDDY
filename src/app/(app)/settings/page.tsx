@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { useAuthStore } from "@/store/authStore";
 import { toast } from "react-hot-toast";
@@ -25,6 +25,8 @@ export default function SettingsPage() {
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [loading, setLoading] = useState(false);
   const [saveLoading, setSaveLoading] = useState(false);
+  const [imageLoading, setImageLoading] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [form, setForm] = useState({
     name:         user?.name         || "",
@@ -100,6 +102,36 @@ export default function SettingsPage() {
     }
   };
 
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (file.size > 5 * 1024 * 1024) {
+      toast.error("File too large (max 5MB)");
+      return;
+    }
+
+    setImageLoading(true);
+    const formData = new FormData();
+    formData.append("file", file);
+
+    try {
+      const res = await fetch("/api/user/profile-image", {
+        method: "POST",
+        body: formData,
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error);
+
+      setUser({ ...user!, profileImage: data.imageUrl });
+      toast.success("Profile photo updated! ✨");
+    } catch (error: any) {
+      toast.error(error.message || "Upload failed");
+    } finally {
+      setImageLoading(false);
+    }
+  };
+
   /* ── Sub-components ──────────────────────────────────────────────── */
   const Field = ({ label, children }: { label: string; children: React.ReactNode }) => (
     <div style={{ marginBottom: "16px" }}>
@@ -159,22 +191,45 @@ export default function SettingsPage() {
         {/* Left Sidebar: Profile Preview + Quick Actions */}
         <div className="flex flex-col gap-6">
           <div className="glass-card text-center" style={{ padding: "24px" }}>
-            <div className="relative inline-block mb-4">
+            <input 
+              type="file" 
+              ref={fileInputRef} 
+              hidden 
+              accept="image/*" 
+              onChange={handleImageUpload} 
+            />
+            <div 
+              className="relative inline-block mb-4 cursor-pointer group"
+              onClick={() => fileInputRef.current?.click()}
+            >
               <div
                 style={{
                   width: 80,
                   height: 80,
                   borderRadius: "50%",
-                  background: "linear-gradient(135deg, var(--color-accent), var(--color-accent-dark))",
+                  backgroundImage: user?.profileImage ? `url(${user.profileImage})` : "linear-gradient(135deg, var(--color-accent), var(--color-accent-dark))",
+                  backgroundSize: "cover",
+                  backgroundPosition: "center",
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
                   color: "white",
                   margin: "0 auto",
                   boxShadow: "0 0 20px rgba(230,57,70,0.25)",
+                  overflow: "hidden",
+                  position: "relative"
                 }}
               >
-                <UserIcon size={40} />
+                {!user?.profileImage && <UserIcon size={40} />}
+                {imageLoading && (
+                  <div style={{
+                    position: "absolute", inset: 0, 
+                    background: "rgba(0,0,0,0.4)", display: "flex", 
+                    alignItems: "center", justifyContent: "center"
+                  }}>
+                     <div className="spinner" style={{ width: 20, height: 20 }} />
+                  </div>
+                )}
               </div>
               <button
                 style={{
@@ -182,6 +237,7 @@ export default function SettingsPage() {
                   width: 24, height: 24, borderRadius: "50%",
                   background: "var(--color-accent)", border: "2px solid var(--color-bg-primary)",
                   display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer",
+                  zIndex: 2
                 }}
               >
                 <Camera size={10} color="white" />

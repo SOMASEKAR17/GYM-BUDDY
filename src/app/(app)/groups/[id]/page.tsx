@@ -3,7 +3,7 @@ import { useState, useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { 
   Users, MapPin, Calendar, Info, Shield, 
-  ArrowLeft, CheckCircle2, Clock, Crown 
+  ArrowLeft, CheckCircle2, Clock, Crown, User
 } from "lucide-react";
 import { toast } from "react-hot-toast";
 
@@ -76,8 +76,7 @@ export default function GroupDetailsPage() {
     <div className="max-w-[800px] mx-auto px-4 md:px-8 py-10">
       <button 
         onClick={() => router.push("/groups")} 
-        className="flex items-center gap-2 text-sm color-text-muted mb-8 hover:text-white transition-colors"
-        style={{ background: "none", border: "none" }}
+        className="flex items-center gap-2 btn-primary text-sm mb-8 hover:text-white transition-colors"
       >
         <ArrowLeft size={16} /> Back to Groups
       </button>
@@ -87,7 +86,16 @@ export default function GroupDetailsPage() {
           <div>
             <h1 style={{ fontFamily: "var(--font-heading)", fontSize: "36px", fontWeight: 700, marginBottom: "8px" }}>{group.name}</h1>
             <div className="flex flex-wrap gap-4 text-sm text-[var(--color-text-secondary)]">
-              <span className="flex items-center gap-1.5"><Crown size={14} color="var(--color-accent)" /> Leader: {group.leader.name}</span>
+              <span className="flex items-center gap-1.5">
+                <Crown size={14} color="var(--color-accent)" /> 
+                Leader: 
+                {group.leader.profileImage ? (
+                  <div style={{ width: 16, height: 16, borderRadius: "50%", background: `url(${group.leader.profileImage})`, backgroundSize: "cover", backgroundPosition: "center" }} />
+                ) : (
+                  <User size={12} color="var(--color-accent)" />
+                )}
+                {group.leader.name}
+              </span>
               <span className="flex items-center gap-1.5"><MapPin size={14} /> {group.gymLocation}</span>
               <span className="flex items-center gap-1.5"><Users size={14} /> {group._count.members} / {group.maxMembers} members</span>
             </div>
@@ -114,9 +122,6 @@ export default function GroupDetailsPage() {
                 Request to Join
               </button>
             )}
-            <div style={{ textAlign: "center", fontSize: "11px", color: "var(--color-text-muted)" }}>
-              {group.privacyType === "PUBLIC" ? "Public Group" : "Invite Only"}
-            </div>
           </div>
         </div>
       </div>
@@ -138,8 +143,14 @@ export default function GroupDetailsPage() {
                 {group.members.map(m => (
                   <div key={m.user.id} className="flex items-center justify-between p-2 rounded-lg hover:bg-[rgba(255,255,255,0.02)] transition-colors">
                     <div className="flex items-center gap-3">
-                      <div style={{ width: 36, height: 36, borderRadius: "50%", background: "linear-gradient(135deg, var(--color-accent), var(--color-accent-dark))", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "14px", fontWeight: 700 }}>
-                        {m.user.name.charAt(0)}
+                      <div style={{ 
+                        width: 36, height: 36, borderRadius: "50%", 
+                        background: m.user.profileImage ? `url(${m.user.profileImage})` : "linear-gradient(135deg, var(--color-accent), var(--color-accent-dark))", 
+                        backgroundSize: "cover",
+                        backgroundPosition: "center",
+                        display: "flex", alignItems: "center", justifyContent: "center", color: "white" 
+                      }}>
+                        {!m.user.profileImage && <User size={18} />}
                       </div>
                       <div>
                         <div style={{ fontSize: "14px", fontWeight: 600 }}>{m.user.name}</div>
@@ -158,14 +169,28 @@ export default function GroupDetailsPage() {
           <section>
             <h2 style={{ fontFamily: "var(--font-heading)", fontSize: "18px", fontWeight: 700, marginBottom: "16px", letterSpacing: "0.05em" }}>REQUIREMENTS</h2>
             <div className="glass-card" style={{ padding: "20px" }}>
-              <p style={{ fontSize: "14px", color: "var(--color-text-secondary)", lineHeight: 1.6 }}>{group.minimumRequirements}</p>
+              <ul className="flex flex-col gap-2 list-none p-0">
+                {group.minimumRequirements.split('\n').filter(r => r.trim()).map((req, i) => (
+                  <li key={i} className="flex items-start gap-2 text-sm text-[var(--color-text-secondary)]">
+                    <CheckCircle2 size={14} className="mt-1 shrink-0 text-accent" />
+                    <span>{req}</span>
+                  </li>
+                ))}
+              </ul>
             </div>
           </section>
 
           <section>
             <h2 style={{ fontFamily: "var(--font-heading)", fontSize: "18px", fontWeight: 700, marginBottom: "16px", letterSpacing: "0.05em" }}>RULES</h2>
             <div className="glass-card" style={{ padding: "20px", border: "1px solid rgba(230,57,70,0.2)" }}>
-              <p style={{ fontSize: "14px", color: "var(--color-text-secondary)", lineHeight: 1.6 }}>{group.rules}</p>
+              <ul className="flex flex-col gap-2 list-none p-0">
+                {group.rules.split('\n').filter(r => r.trim()).map((rule, i) => (
+                  <li key={i} className="flex items-start gap-2 text-sm text-[var(--color-text-secondary)]">
+                    <Shield size={14} className="mt-1 shrink-0 text-accent" />
+                    <span>{rule}</span>
+                  </li>
+                ))}
+              </ul>
             </div>
           </section>
         </div>

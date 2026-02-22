@@ -23,8 +23,26 @@ export async function DELETE(
             return NextResponse.json({ error: "Leader cannot be removed. Transfer leadership first." }, { status: 400 });
         }
 
-        await prisma.groupMember.delete({
-            where: { userId } // Since userId is unique in GroupMember
+        await prisma.$transaction(async (tx) => {
+            await tx.groupMember.delete({
+                where: { userId }
+            });
+
+            await tx.pr.updateMany({
+                where: { userId, groupId: id },
+                data: { groupId: null }
+            });
+
+            // Check if group is now empty
+            const remainingMembers = await tx.groupMember.count({
+                where: { groupId: id }
+            });
+
+            if (remainingMembers === 0) {
+                await tx.group.delete({
+                    where: { id }
+                });
+            }
         });
 
         return NextResponse.json({ success: true });

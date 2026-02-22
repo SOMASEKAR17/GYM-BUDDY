@@ -57,6 +57,9 @@ model Group {
   members             GroupMember[]
   requests            JoinRequest[]
   prs                 Pr[]          @relation("GroupPRs")
+  overallScore        Float         @default(0)
+  previousScore       Float         @default(0)
+  dailyDelta          Float         @default(0)
 
   @@index([leaderId])
 }
@@ -90,14 +93,14 @@ model JoinRequest {
 model Pr {
   id           String         @id @default(cuid())
   userId       String
-  groupId      String
+  groupId      String?
   exerciseName String
   weight       Float
   reps         Int
   status       String
   proofUrl     String?
   createdAt    DateTime       @default(now())
-  group        Group          @relation("GroupPRs", fields: [groupId], references: [id], onDelete: Cascade)
+  group        Group?         @relation("GroupPRs", fields: [groupId], references: [id], onDelete: Cascade)
   user         User           @relation(fields: [userId], references: [id], onDelete: Cascade)
   endorsements PrEndorsement[]
 

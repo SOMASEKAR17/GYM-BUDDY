@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getCurrentUser } from "@/lib/auth";
+// Trigger rebuild after Prisma generate
 
 export async function GET(req: NextRequest) {
     try {
@@ -8,23 +9,22 @@ export async function GET(req: NextRequest) {
         const type = searchParams.get("type"); // "leaderboard" or "list"
 
         if (type === "leaderboard") {
-            // Basic leaderboard logic: Rank by total verified PRs
+            // Recalculate scores to keep it fresh for the demo/dev
+            // In production, this would be a real cron job
+            const { calculateGroupScores } = await import("@/lib/scoring");
+            await calculateGroupScores();
+
             const groups = await prisma.group.findMany({
                 include: {
-                    members: true,
-                    leader: { select: { name: true } },
-                    _count: {
-                        select: {
-                            prs: { where: { status: "VERIFIED" } }
-                        }
-                    }
+                    leader: { select: { name: true, profileImage: true } },
+                    _count: { select: { members: true, prs: { where: { status: "VERIFIED" } } } }
                 },
-                orderBy: {
-                    prs: {
-                        _count: 'desc'
-                    }
-                },
-                take: 5
+                orderBy: [
+                    { overallScore: 'desc' },
+                    { members: { _count: 'desc' } },
+                    { createdAt: 'asc' }
+                ],
+                take: 10
             });
 
             return NextResponse.json({
@@ -32,10 +32,12 @@ export async function GET(req: NextRequest) {
                     id: g.id,
                     name: g.name,
                     leaderName: g.leader.name,
-                    memberCount: g.members.length,
+                    leaderImage: g.leader.profileImage,
+                    memberCount: g._count.members,
                     verifiedPRs: g._count.prs,
-                    // Placeholder performance score: verified PRs * member count (bonus)
-                    performanceScore: g._count.prs * 10
+                    performanceScore: Math.round(g.overallScore),
+                    dailyDelta: g.dailyDelta,
+                    previousScore: g.previousScore
                 }))
             });
         }
@@ -43,11 +45,19 @@ export async function GET(req: NextRequest) {
         // Default: List all groups
         const groups = await prisma.group.findMany({
             include: {
+                leader: { select: { name: true, profileImage: true } },
                 _count: { select: { members: true } }
             }
         });
 
-        return NextResponse.json({ groups });
+        return NextResponse.json({
+            groups: groups.map(g => ({
+                ...g,
+                leaderName: g.leader.name,
+                leaderImage: g.leader.profileImage,
+                memberCount: g._count.members
+            }))
+        });
     } catch (error) {
         console.error("GET Groups Error:", error);
         return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });

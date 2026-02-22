@@ -16,6 +16,10 @@ export async function POST(req: NextRequest) {
 
         const { exerciseName, weight, reps, proofUrl } = await req.json();
 
+        const memberCount = await prisma.groupMember.count({
+            where: { groupId: membership.groupId }
+        });
+
         const pr = await prisma.pr.create({
             data: {
                 userId: user.id,
@@ -23,7 +27,7 @@ export async function POST(req: NextRequest) {
                 exerciseName,
                 weight: parseFloat(weight),
                 reps: parseInt(reps),
-                status: "PENDING",
+                status: memberCount === 1 ? "VERIFIED" : "PENDING",
                 proofUrl
             }
         });

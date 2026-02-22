@@ -15,7 +15,25 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
 
         const requests = await prisma.joinRequest.findMany({
             where: { groupId: id, status: "PENDING" },
-            include: { user: { select: { id: true, name: true, profileImage: true, fitnessLevel: true } } }
+            include: {
+                user: {
+                    select: {
+                        id: true,
+                        name: true,
+                        profileImage: true,
+                        fitnessLevel: true,
+                        fitnessGoal: true,
+                        bio: true,
+                        age: true,
+                        gymLocation: true,
+                        course: true,
+                        year: true,
+                        _count: {
+                            select: { prs: { where: { status: "VERIFIED" } } }
+                        }
+                    }
+                }
+            }
         });
 
         return NextResponse.json({ requests });
@@ -72,6 +90,11 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
                 prisma.joinRequest.updateMany({
                     where: { userId: joinRequest.userId, status: "PENDING" },
                     data: { status: "REJECTED" }
+                }),
+                // Transfer user's PR history to the new group
+                prisma.pr.updateMany({
+                    where: { userId: joinRequest.userId },
+                    data: { groupId }
                 })
             ]);
         } else {

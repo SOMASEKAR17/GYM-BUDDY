@@ -101,13 +101,15 @@ export default function MatchesPage() {
                     width: 52,
                     height: 52,
                     borderRadius: "50%",
-                    background: "linear-gradient(135deg, var(--color-accent), var(--color-accent-dark))",
+                    background: match.partner.profileImage ? `url(${match.partner.profileImage})` : "linear-gradient(135deg, var(--color-accent), var(--color-accent-dark))",
+                    backgroundSize: "cover",
+                    backgroundPosition: "center",
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "center",
                     color: "white",
                   }}>
-                    <User size={24} />
+                    {!match.partner.profileImage && <User size={24} />}
                   </div>
                   {match.hasUnread && (
                     <div style={{

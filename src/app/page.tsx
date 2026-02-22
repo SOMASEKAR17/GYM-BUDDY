@@ -1,7 +1,7 @@
 "use client";
 import Link from "next/link";
 import { useState, useEffect } from "react";
-import { Dumbbell, Users, Zap, Shield, ChevronRight, Activity, Menu, X as CloseIcon } from "lucide-react";
+import { Dumbbell, Users, Zap, Shield, ChevronRight, Activity, Menu, X as CloseIcon, Trophy, MessageSquare, Search } from "lucide-react";
 
 const stats = [
   { value: "1,200+", label: "Students Matched" },
@@ -12,17 +12,32 @@ const stats = [
 
 const features = [
   {
-    icon: <Dumbbell size={24} />,
-    title: "Smart Compatibility",
+    icon: <Users size={24} />,
+    title: "Gym Groups",
+    desc: "Form or join exclusive gym groups. Stay accountable with your squad and push each other to new heights.",
+  },
+  {
+    icon: <Trophy size={24} />,
+    title: "Group Leaderboards",
+    desc: "Track your group's performance against the entire VIT community. See who the real powerhouses are.",
+  },
+  {
+    icon: <Activity size={24} />,
+    title: "Verified PRs",
+    desc: "Submit your Personal Records for group endorsement. Build a legacy of strength within your circle.",
+  },
+  {
+    icon: <Search size={24} />,
+    title: "Smart Matching",
     desc: "Our algorithm matches you based on gym, timing, workout split, goals, and experience level.",
   },
   {
-    icon: <Users size={24} />,
+    icon: <Dumbbell size={24} />,
     title: "Swipe to Connect",
     desc: "Browse through profiles of VIT students with matching fitness habits. Right means interest.",
   },
   {
-    icon: <Zap size={24} />,
+    icon: <MessageSquare size={24} />,
     title: "Real-Time Chat",
     desc: "Message your gym partner instantly once you both match. Coordinate sessions on the go.",
   },
@@ -202,11 +217,11 @@ export default function LandingPage() {
                 letterSpacing: "0.02em",
               }}
             >
-              FIND YOUR{" "}
+              DOMINATE THE{" "}
               <span className="text-gradient" style={{ display: "block" }}>
-                GYM PARTNER
+                LEADERBOARD
               </span>
-              AT VIT
+              WITH YOUR SQUAD
             </h1>
 
             <p
@@ -217,10 +232,7 @@ export default function LandingPage() {
                 maxWidth: "440px",
               }}
             >
-              Stop training alone. GymBuddy matches you with VIT students who share your{" "}
-              <span style={{ color: "white" }}>workout schedule</span>,{" "}
-              <span style={{ color: "white" }}>fitness goals</span>, and{" "}
-              <span style={{ color: "white" }}>training style</span>.
+              The ultimate VIT fitness social platform. Join exclusive <span style={{ color: "white" }}>Gym Groups</span>, track your <span style={{ color: "white" }}>Personal Records</span>, and climb the rankings together.
             </p>
 
             <div className="flex flex-wrap gap-3">
@@ -302,7 +314,7 @@ export default function LandingPage() {
                 </div>
                 <div>
                   <div style={{ fontFamily: "var(--font-heading)", fontSize: "20px", fontWeight: 700 }}>
-                    RAHUL S.
+                    VIT ELITES
                   </div>
                   <div style={{ fontSize: "13px", color: "var(--color-text-secondary)" }}>
                     B.Tech CSE • 3rd Year
@@ -314,16 +326,16 @@ export default function LandingPage() {
                 <div
                   className="ml-auto rounded-lg text-center"
                   style={{
-                    background: "rgba(230,57,71,0.1)",
-                    border: "1px solid rgba(230,57,71,0.3)",
+                    background: "rgba(255, 215, 0, 0.1)",
+                    border: "1px solid rgba(255, 215, 0, 0.3)",
                     padding: "6px 12px",
                   }}
                 >
-                  <div style={{ fontSize: "18px", fontWeight: 700, color: "var(--color-accent)", fontFamily: "var(--font-heading)" }}>
-                    87%
+                  <div style={{ fontSize: "18px", fontWeight: 700, color: "#FFD700", fontFamily: "var(--font-heading)" }}>
+                    RANK #1
                   </div>
                   <div style={{ fontSize: "10px", color: "var(--color-text-muted)", textTransform: "uppercase" }}>
-                    Match
+                    Leaderboard
                   </div>
                 </div>
               </div>
@@ -331,9 +343,9 @@ export default function LandingPage() {
               {/* Stats */}
               <div className="grid grid-cols-3 gap-2.5 mb-5">
                 {[
-                  { label: "Split",  value: "PPL" },
-                  { label: "Timing", value: "6–8 AM" },
-                  { label: "Goal",   value: "Muscle" },
+                  { label: "Members",  value: "8/10" },
+                  { label: "Total PRs", value: "142" },
+                  { label: "Points",   value: "1420" },
                 ].map((item) => (
                   <div
                     key={item.label}
@@ -353,25 +365,13 @@ export default function LandingPage() {
               </div>
 
               <p style={{ fontSize: "13px", color: "var(--color-text-secondary)", lineHeight: 1.6, flexGrow: 1 }}>
-                &quot;Serious about hypertrophy. Looking for a consistent partner for morning sessions at Gym 1. No excuses mentality. 5 days/week.&quot;
+                &quot;The elite squad of powerlifters from VIT. We hit the Main Gym every morning at 6 AM. No ego, just heavy reps and verified progress.&quot;
               </p>
 
               {/* Swipe buttons */}
               <div className="flex gap-3 mt-6">
-                <button
-                  className="flex-1 rounded-lg cursor-pointer transition-all duration-200"
-                  style={{
-                    padding: "12px",
-                    background: "rgba(255,255,255,0.04)",
-                    border: "1px solid var(--color-border-subtle)",
-                    color: "var(--color-text-secondary)",
-                    fontSize: "22px",
-                  }}
-                >
-                  ✕
-                </button>
-                <button className="btn-primary" style={{ flex: 2, fontSize: "15px" }}>
-                  💪 Match
+                <button className="btn-primary" style={{ flex: 1, fontSize: "15px" }}>
+                  Join the Squad
                 </button>
               </div>
             </div>
@@ -420,7 +420,7 @@ export default function LandingPage() {
           </h2>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 md:gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 md:gap-6">
           {features.map((f) => (
             <div
               key={f.title}

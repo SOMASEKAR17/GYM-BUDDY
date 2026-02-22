@@ -17,6 +17,10 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
         if (!pr) return NextResponse.json({ error: "PR not found" }, { status: 404 });
 
         // Check if user is in the same group
+        if (!pr.group) {
+            return NextResponse.json({ error: "No group associated with this PR" }, { status: 400 });
+        }
+
         const isMember = pr.group.members.some(m => m.userId === user.id);
         if (!isMember) {
             return NextResponse.json({ error: "Only group members can endorse PRs" }, { status: 403 });
