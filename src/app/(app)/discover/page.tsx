@@ -357,6 +357,7 @@ export default function DiscoverPage() {
             </h1>
             <p
               style={{ color: "var(--color-text-secondary)", fontSize: "14px" }}
+              className="hidden md:block"
             >
               Swipe right to match, left to skip
             </p>

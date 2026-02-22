@@ -7,7 +7,14 @@ import { Dumbbell, Eye, EyeOff } from "lucide-react";
 import { useAuthStore } from "@/store/authStore";
 
 const COURSES = ["B.Tech", "M.Tech", "MBA", "MCA", "BCA", "PhD"];
-const YEARS = ["1st Year", "2nd Year", "3rd Year", "4th Year", "5th Year"];
+const COURSE_YEARS: Record<string, number> = {
+  "B.Tech": 4,
+  "M.Tech": 2,
+  "MBA": 2,
+  "MCA": 2,
+  "BCA": 3,
+  "PhD": 5
+};
 
 import { auth } from "@/lib/firebase";
 import { createUserWithEmailAndPassword } from "firebase/auth";
@@ -20,6 +27,35 @@ export default function RegisterPage() {
   const [form, setForm] = useState({
     name: "", email: "", password: "", course: "", year: "",
   });
+
+  const getOrdinal = (n: number) => {
+    const s = ["th", "st", "nd", "rd"];
+    const v = n % 100;
+    return s[(v - 20) % 10] || s[v] || s[0];
+  };
+
+  const getYearOptions = () => {
+    const maxYears = COURSE_YEARS[form.course as keyof typeof COURSE_YEARS];
+    if (!maxYears) return []; // If no course selected or course not in map
+    return Array.from({ length: maxYears }, (_, i) => `${i + 1}${getOrdinal(i + 1)} Year`);
+  };
+
+  const handleCourseChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const newCourse = e.target.value;
+    const maxYearsForNewCourse = COURSE_YEARS[newCourse as keyof typeof COURSE_YEARS];
+    const currentYearNumber = parseInt(form.year.split(' ')[0]);
+
+    setForm(prevForm => {
+      let newYear = prevForm.year;
+      // If the current year is out of range for the new course, reset it
+      if (maxYearsForNewCourse && currentYearNumber > maxYearsForNewCourse) {
+        newYear = ""; // Reset year if it's no longer valid
+      } else if (!maxYearsForNewCourse) {
+        newYear = ""; // Reset year if no max years for the course (e.g., "Select" option)
+      }
+      return { ...prevForm, course: newCourse, year: newYear };
+    });
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -94,7 +130,7 @@ export default function RegisterPage() {
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "12px" }}>
             <div>
               <label style={{ fontSize: "12px", fontWeight: 600, color: "var(--color-text-secondary)", textTransform: "uppercase", letterSpacing: "0.06em", display: "block", marginBottom: "6px" }}>Course</label>
-              <select id="reg-course" className="form-input" value={form.course} onChange={(e) => setForm({ ...form, course: e.target.value })} style={{ cursor: "pointer" }}>
+              <select id="reg-course" className="form-input" value={form.course} onChange={handleCourseChange} style={{ cursor: "pointer" }}>
                 <option value="">Select</option>
                 {COURSES.map((c) => <option className="font-black" key={c} value={c}>{c}</option>)}
               </select>
@@ -103,7 +139,7 @@ export default function RegisterPage() {
               <label style={{ fontSize: "12px", fontWeight: 600, color: "var(--color-text-secondary)", textTransform: "uppercase", letterSpacing: "0.06em", display: "block", marginBottom: "6px" }}>Year</label>
               <select id="reg-year" className="form-input" value={form.year} onChange={(e) => setForm({ ...form, year: e.target.value })} style={{ cursor: "pointer" }}>
                 <option value="">Select</option>
-                {YEARS.map((y) => <option key={y} value={y}>{y}</option>)}
+                {getYearOptions().map((y) => <option key={y} value={y}>{y}</option>)}
               </select>
             </div>
           </div>

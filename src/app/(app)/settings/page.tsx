@@ -17,7 +17,16 @@ const LEVELS        = ["Beginner", "Intermediate", "Advanced"];
 const GOALS         = ["Muscle Gain", "Fat Loss", "Strength", "General Fitness", "Athletic Performance"];
 const GENDERS       = ["Male", "Female", "Non-binary", "Prefer not to say"];
 const COURSES       = ["B.Tech", "M.Tech", "MBA", "MCA", "BCA", "PhD"];
-const YEARS         = ["1st Year", "2nd Year", "3rd Year", "4th Year", "5th Year"];
+const COURSE_YEARS: Record<string, number> = {
+  "B.Tech": 4,
+  "M.Tech": 2,
+  "M.Tech-Integrated":5,
+  "MBA": 2,
+  "MCA": 2,
+  "BCA": 3,
+  "PhD": 5,
+};
+
 const WORKOUT_TIMES = ["Morning (6 AM - 9 AM)", "Afternoon (3 PM - 5 PM)", "Evening (5 PM - 8 PM)", "Full Time (Outside VIT)"];
 const DURATIONS     = ["45 min", "1 hour", "1.5 hours", "2 hours", "2+ hours"];
 const SPLITS        = ["Push Pull Legs", "Bro Split", "Upper / Lower", "Full Body", "Custom"];
@@ -87,6 +96,34 @@ export default function SettingsPage() {
         ? prev.preferredPartnerTraits.filter(x => x !== t) 
         : [...prev.preferredPartnerTraits, t]
     }));
+  };
+
+  const getOrdinal = (n: number) => {
+    const s = ["th", "st", "nd", "rd"];
+    const v = n % 100;
+    return s[(v - 20) % 10] || s[v] || s[0];
+  };
+
+  const getYearOptions = () => {
+    const maxYears = COURSE_YEARS[form.course as keyof typeof COURSE_YEARS];
+    if (!maxYears) return []; 
+    return Array.from({ length: maxYears }, (_, i) => `${i + 1}${getOrdinal(i + 1)} Year`);
+  };
+
+  const handleCourseChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const newCourse = e.target.value;
+    const maxYearsForNewCourse = COURSE_YEARS[newCourse as keyof typeof COURSE_YEARS];
+    const currentYearNumber = parseInt(form.year.split(' ')[0]);
+
+    setForm(prevForm => {
+      let newYear = prevForm.year;
+      if (maxYearsForNewCourse && currentYearNumber > maxYearsForNewCourse) {
+        newYear = ""; 
+      } else if (!maxYearsForNewCourse) {
+        newYear = ""; 
+      }
+      return { ...prevForm, course: newCourse, year: newYear };
+    });
   };
 
   const handleSaveProfile = async () => {
@@ -380,7 +417,7 @@ export default function SettingsPage() {
                 <Field label="Course">
                   <select
                     className="form-input" value={form.course}
-                    onChange={(e) => setForm({ ...form, course: e.target.value })}
+                    onChange={handleCourseChange}
                     style={{ backgroundColor: "#1a1a1a", color: "white" }}
                   >
                     <option value="">Select</option>
@@ -394,7 +431,7 @@ export default function SettingsPage() {
                     style={{ backgroundColor: "#1a1a1a", color: "white" }}
                   >
                     <option value="">Select</option>
-                    {YEARS.map(y => <option key={y}>{y}</option>)}
+                    {getYearOptions().map(y => <option key={y}>{y}</option>)}
                   </select>
                 </Field>
               </div>
