@@ -125,7 +125,9 @@ export default function LeaderboardPage() {
                 }}>
                   <div className="rank-label" style={{ color: "#C0C0C0" }}>#2</div>
                   <div style={{ 
-                    width: 60, height: 60, borderRadius: "50%", background: activeTab === 'groups' ? 'rgba(255,255,255,0.05)' : (topThree[1] as UserLB).image ? `url(${(topThree[1] as UserLB).image})` : '#333',
+                    width: 60, height: 60, borderRadius: "50%", 
+                    backgroundColor: activeTab === 'groups' ? 'rgba(255,255,255,0.05)' : (topThree[1] as UserLB).image ? 'transparent' : '#333',
+                    backgroundImage: activeTab === 'individuals' && (topThree[1] as UserLB).image ? `url(${(topThree[1] as UserLB).image})` : 'none',
                     backgroundSize: 'cover', backgroundPosition: 'center', marginBottom: 12, display: 'flex', alignItems: 'center', justifyContent: 'center'
                   }}>
                     {activeTab === 'individuals' && !(topThree[1] as UserLB).image && <User size={24} />}
@@ -152,7 +154,9 @@ export default function LeaderboardPage() {
                    <div style={{ position: 'absolute', top: -20, fontSize: 32 }}>👑</div>
                   <div className="rank-label" style={{ color: "#FFD700", fontSize: "28px" }}>#1</div>
                   <div style={{ 
-                    width: 80, height: 80, borderRadius: "50%", background: activeTab === 'groups' ? 'rgba(255,255,255,0.05)' : (topThree[0] as UserLB).image ? `url(${(topThree[0] as UserLB).image})` : '#333',
+                    width: 80, height: 80, borderRadius: "50%", 
+                    backgroundColor: activeTab === 'groups' ? 'rgba(255,255,255,0.05)' : (topThree[0] as UserLB).image ? 'transparent' : '#333',
+                    backgroundImage: activeTab === 'individuals' && (topThree[0] as UserLB).image ? `url(${(topThree[0] as UserLB).image})` : 'none',
                     backgroundSize: 'cover', backgroundPosition: 'center', marginBottom: 16, display: 'flex', alignItems: 'center', justifyContent: 'center',
                     border: '3px solid #FFD700'
                   }}>
@@ -179,7 +183,9 @@ export default function LeaderboardPage() {
                 }}>
                   <div className="rank-label" style={{ color: "#CD7F32", fontSize: "18px" }}>#3</div>
                   <div style={{ 
-                    width: 50, height: 50, borderRadius: "50%", background: activeTab === 'groups' ? 'rgba(255,255,255,0.05)' : (topThree[2] as UserLB).image ? `url(${(topThree[2] as UserLB).image})` : '#333',
+                    width: 50, height: 50, borderRadius: "50%", 
+                    backgroundColor: activeTab === 'groups' ? 'rgba(255,255,255,0.05)' : (topThree[2] as UserLB).image ? 'transparent' : '#333',
+                    backgroundImage: activeTab === 'individuals' && (topThree[2] as UserLB).image ? `url(${(topThree[2] as UserLB).image})` : 'none',
                     backgroundSize: 'cover', backgroundPosition: 'center', marginBottom: 10, display: 'flex', alignItems: 'center', justifyContent: 'center'
                   }}>
                     {activeTab === 'individuals' && !(topThree[2] as UserLB).image && <User size={20} />}
@@ -204,7 +210,8 @@ export default function LeaderboardPage() {
                 
                 <div style={{ 
                   width: 40, height: 40, borderRadius: "50%", 
-                  background: activeTab === 'groups' ? 'rgba(255,255,255,0.05)' : (item as UserLB).image ? `url(${(item as UserLB).image})` : '#333',
+                  backgroundColor: activeTab === 'groups' ? 'rgba(255,255,255,0.05)' : (item as UserLB).image ? 'transparent' : '#333',
+                  backgroundImage: activeTab === 'individuals' && (item as UserLB).image ? `url(${(item as UserLB).image})` : 'none',
                   backgroundSize: 'cover', backgroundPosition: 'center', display: 'flex', alignItems: 'center', justifyContent: 'center'
                 }}>
                    {activeTab === 'individuals' && !(item as UserLB).image && <User size={18} />}
