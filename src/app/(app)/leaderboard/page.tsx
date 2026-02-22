@@ -117,7 +117,7 @@ export default function LeaderboardPage() {
           <div className="flex flex-col md:flex-row items-end justify-center gap-4 md:gap-0 h-auto md:h-[450px] mb-16">
             {/* Rank 2 */}
             {topThree[1] && (
-              <div className="order-2 md:order-1 flex-1 w-full max-w-[300px] flex flex-col items-center">
+              <div className="order-2 md:order-1 flex-1 w-full max-w-[340px] flex flex-col items-center">
                 <div className="glass-card podium-card podium-2" style={{ 
                   height: "280px", width: "100%", padding: "24px", 
                   display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center",
@@ -175,7 +175,7 @@ export default function LeaderboardPage() {
 
             {/* Rank 3 */}
             {topThree[2] && (
-              <div className="order-3 md:order-3 flex-1 w-full max-w-[280px] flex flex-col items-center">
+              <div className="order-3 md:order-3 flex-1 w-full max-w-[340px] flex flex-col items-center">
                 <div className="glass-card podium-card podium-3" style={{ 
                   height: "220px", width: "100%", padding: "20px", 
                   display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center",
