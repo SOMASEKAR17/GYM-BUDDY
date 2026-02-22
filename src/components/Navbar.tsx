@@ -4,7 +4,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { Dumbbell, Search, MessageSquare, User, Settings, Bell, LogOut, RotateCcw, Menu, X as CloseIcon, Users, Trophy } from "lucide-react";
 import { useAuthStore } from "@/store/authStore";
 import { useNotificationStore } from "@/store/notificationStore";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { toast } from "react-hot-toast";
 
 const NAV_ITEMS = [
@@ -23,6 +23,30 @@ export default function Navbar() {
   const [showNotif, setShowNotif] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [userGroup, setUserGroup] = useState<any>(null);
+
+  const notifRefDesktop = useRef<HTMLDivElement>(null);
+  const notifRefMobile = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      const isOutsideDesktop = notifRefDesktop.current && !notifRefDesktop.current.contains(event.target as Node);
+      const isOutsideMobile = notifRefMobile.current && !notifRefMobile.current.contains(event.target as Node);
+      
+      if (isOutsideDesktop && isOutsideMobile) {
+        setShowNotif(false);
+      }
+    };
+
+    if (showNotif) {
+      document.addEventListener("mousedown", handleClickOutside);
+    } else {
+      document.removeEventListener("mousedown", handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [showNotif]);
 
   useEffect(() => {
     fetch("/api/notifications")
@@ -129,7 +153,7 @@ export default function Navbar() {
           })}
 
           {/* Notifications */}
-          <div style={{ position: "relative" }}>
+          <div ref={notifRefDesktop} style={{ position: "relative" }}>
             <button
               id="notif-btn"
               onClick={() => setShowNotif(!showNotif)}
@@ -275,7 +299,7 @@ export default function Navbar() {
         {/* Mobile Controls */}
         <div className="flex md:hidden items-center gap-3">
           {/* Mobile Notifications */}
-          <div style={{ position: "relative" }}>
+          <div ref={notifRefMobile} style={{ position: "relative" }}>
             <button
               onClick={() => setShowNotif(!showNotif)}
               style={{
