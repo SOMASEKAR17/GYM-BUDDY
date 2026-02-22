@@ -20,6 +20,12 @@ export async function POST(req: NextRequest) {
             where: { groupId: membership.groupId }
         });
 
+        if (memberCount < 2) {
+            return NextResponse.json({
+                error: "Your group must have at least 2 members to register a PR for accountability."
+            }, { status: 400 });
+        }
+
         const pr = await prisma.pr.create({
             data: {
                 userId: user.id,
@@ -27,7 +33,7 @@ export async function POST(req: NextRequest) {
                 exerciseName,
                 weight: parseFloat(weight),
                 reps: parseInt(reps),
-                status: memberCount === 1 ? "VERIFIED" : "PENDING",
+                status: "PENDING",
                 proofUrl
             }
         });
