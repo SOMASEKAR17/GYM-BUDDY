@@ -86,7 +86,7 @@ export default function Navbar() {
 
   const handleLogout = () => {
     logout();
-    router.push("/");
+    router.push("/login");
   };
 
   // Close menu when navigating

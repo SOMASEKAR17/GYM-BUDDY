@@ -142,7 +142,7 @@ export default function SettingsPage() {
   const handleLogout = () => {
     logout();
     toast.success("Logged out successfully");
-    router.push("/");
+    router.push("/login");
   };
 
   const handleDeleteAccount = async () => {
@@ -158,7 +158,7 @@ export default function SettingsPage() {
 
       toast.success("Account deleted successfully. We'll miss you! 👋");
       logout();
-      router.push("/");
+      router.push("/login");
     } catch {
       toast.error("Something went wrong");
     } finally {
