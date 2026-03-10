@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "react-hot-toast";
 import { Dumbbell, CheckCircle2 } from "lucide-react";
@@ -7,11 +7,11 @@ import { useAuthStore } from "@/store/authStore";
 
 const STEPS = ["Profile Info", "Workout Preferences", "Partner Traits"];
 
-const GYM_LOCATIONS = [
-  "Fitty New (Mens)", "Fitty Old (Mens)", "Outdoor Gym (Mens)", "Indoor Gym (Mens)", "Trendset Gym (Mens)",
-  "Girls Gym",
-  "Infinity Fitness (Outside)", "Muscle Engineer (Outside)", "IMMC Fit Club (Outside)", "Stay Fit (Outside)", "AJ Fitness (Outside)"
-];
+const MENS_GYMS     = ["Fitty New (Mens)", "Fitty Old (Mens)", "Outdoor Gym (Mens)", "Indoor Gym (Mens)", "Trendset Gym (Mens)"];
+const GIRLS_GYMS    = ["Girls Gym"];
+const OUTSIDE_GYMS  = ["Infinity Fitness (Outside)", "Muscle Engineer (Outside)", "IMMC Fit Club (Outside)", "Stay Fit (Outside)", "AJ Fitness (Outside)"];
+const GYM_LOCATIONS = [...MENS_GYMS, ...GIRLS_GYMS, ...OUTSIDE_GYMS];
+
 const WORKOUT_TIMES = ["Morning (6 AM - 9 AM)", "Afternoon (3 PM - 5 PM)", "Evening (5 PM - 8 PM)", "Full Time (Outside VIT)"];
 const DURATIONS = ["45 min", "1 hour", "1.5 hours", "2 hours", "2+ hours"];
 const SPLITS = ["Push Pull Legs", "Bro Split", "Upper / Lower", "Full Body", "Custom"];
@@ -23,9 +23,15 @@ const GENDERS = ["Male", "Female", "Non-binary", "Prefer not to say"];
 
 export default function OnboardingPage() {
   const router = useRouter();
-  const { user, setUser } = useAuthStore();
+  const { user, setUser, isHydrated } = useAuthStore();
   const [step, setStep] = useState(0);
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    if (isHydrated && !user) {
+      router.push("/login");
+    }
+  }, [user, isHydrated, router]);
 
   const [profile, setProfile] = useState({
     age: "", gender: "", bio: "", gymLocation: "", fitnessLevel: "", fitnessGoal: "",
@@ -94,7 +100,7 @@ export default function OnboardingPage() {
   );
 
   return (
-    <div style={{ minHeight: "100vh", background: "var(--color-bg-primary)", display: "flex", alignItems: "center", justifyContent: "center", padding: "20px" }}>
+    <div style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", padding: "20px" }}>
       <div style={{ width: "100%", maxWidth: "600px" }}>
         {/* Header */}
         <div style={{ textAlign: "center", marginBottom: "36px" }}>
@@ -143,7 +149,12 @@ export default function OnboardingPage() {
               <div>
                 <label style={{ fontSize: "12px", color: "var(--color-text-secondary)", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.06em", display: "block", marginBottom: "8px" }}>Gym Location</label>
                 <div style={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: "8px" }}>
-                  {GYM_LOCATIONS.map((g) => (
+                  {(profile.gender === "Male" 
+                    ? [...MENS_GYMS, ...OUTSIDE_GYMS] 
+                    : profile.gender === "Female" 
+                      ? [...GIRLS_GYMS, ...OUTSIDE_GYMS] 
+                      : GYM_LOCATIONS
+                  ).map((g) => (
                     <SelectCard key={g} value={g} selected={profile.gymLocation === g} onClick={() => setProfile({ ...profile, gymLocation: g })}>{g}</SelectCard>
                   ))}
                 </div>

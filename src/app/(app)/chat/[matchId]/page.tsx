@@ -17,7 +17,7 @@ interface Message {
 
 interface MatchInfo {
   matchId: string;
-  partner: { id: string; name: string; gymLocation?: string; fitnessGoal?: string };
+  partner: { id: string; name: string; gymLocation?: string; fitnessGoal?: string; profileImage?: string };
 }
 
 export default function ChatPage() {
@@ -122,8 +122,14 @@ export default function ChatPage() {
         <button onClick={() => router.push("/matches")} style={{ background: "none", border: "none", color: "var(--color-text-muted)", cursor: "pointer", display: "flex", alignItems: "center" }}>
           <ArrowLeft size={20} />
         </button>
-        <div style={{ width: 42, height: 42, borderRadius: "50%", background: "linear-gradient(135deg, var(--color-accent), var(--color-accent-dark))", display: "flex", alignItems: "center", justifyContent: "center", color: "white" }}>
-          <User size={20} />
+        <div style={{ 
+          width: 42, height: 42, borderRadius: "50%", 
+          background: partner?.profileImage ? `url(${partner.profileImage})` : "linear-gradient(135deg, var(--color-accent), var(--color-accent-dark))", 
+          backgroundSize: "cover",
+          backgroundPosition: "center",
+          display: "flex", alignItems: "center", justifyContent: "center", color: "white" 
+        }}>
+          {!partner?.profileImage && <User size={20} />}
         </div>
         <div style={{ flex: 1 }}>
           <div style={{ fontWeight: 600, fontSize: "15px" }}>{partner?.name || "Loading..."}</div>
@@ -161,8 +167,14 @@ export default function ChatPage() {
             return (
               <div key={msg.id} style={{ display: "flex", justifyContent: isMe ? "flex-end" : "flex-start", gap: "8px", alignItems: "flex-end" }}>
                 {!isMe && (
-                  <div style={{ width: 28, height: 28, borderRadius: "50%", background: "linear-gradient(135deg, #555, #333)", display: "flex", alignItems: "center", justifyContent: "center", color: "white", flexShrink: 0 }}>
-                    <User size={14} />
+                  <div style={{ 
+                    width: 28, height: 28, borderRadius: "50%", 
+                    background: msg.sender.profileImage ? `url(${msg.sender.profileImage})` : "linear-gradient(135deg, #555, #333)", 
+                    backgroundSize: "cover",
+                    backgroundPosition: "center",
+                    display: "flex", alignItems: "center", justifyContent: "center", color: "white", flexShrink: 0 
+                  }}>
+                    {!msg.sender.profileImage && <User size={14} />}
                   </div>
                 )}
                 <div style={{ maxWidth: "65%" }}>
