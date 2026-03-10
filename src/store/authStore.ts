@@ -39,12 +39,16 @@ export const useAuthStore = create<AuthState>()(
             setLoading: (isLoading) => set({ isLoading }),
             setHydrated: (isHydrated) => set({ isHydrated }),
             logout: async () => {
-                set({ user: null });
                 try {
+                    // Sign out from Firebase first
                     await signOut(auth);
+                    // Clear the server-side session cookie
                     await fetch("/api/auth/logout", { method: "POST" });
                 } catch (error) {
                     console.error("Logout error:", error);
+                } finally {
+                    // Set user to null last to trigger UI transition
+                    set({ user: null });
                 }
             },
         }),

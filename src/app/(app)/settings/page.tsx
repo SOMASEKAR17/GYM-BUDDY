@@ -11,10 +11,14 @@ export default function SettingsPage() {
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [loading, setLoading] = useState(false);
 
-  const handleLogout = () => {
-    logout();
-    toast.success("Logged out successfully");
-    router.push("/");
+  const handleLogout = async () => {
+    try {
+      await logout();
+      toast.success("Logged out successfully");
+      window.location.href = "/";
+    } catch {
+      window.location.href = "/";
+    }
   };
 
   const settingSections = [
@@ -39,8 +43,8 @@ export default function SettingsPage() {
       }
 
       toast.success("Account deleted successfully. We'll miss you! 👋");
-      logout();
-      router.push("/");
+      await logout();
+      window.location.href = "/";
     } catch {
       toast.error("Something went wrong");
     } finally {

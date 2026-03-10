@@ -41,9 +41,13 @@ export default function Navbar() {
     }
   };
 
-  const handleLogout = () => {
-    logout();
-    router.push("/");
+  const handleLogout = async () => {
+    try {
+      await logout();
+      window.location.href = "/";
+    } catch {
+      window.location.href = "/";
+    }
   };
 
   // Close menu when navigating
