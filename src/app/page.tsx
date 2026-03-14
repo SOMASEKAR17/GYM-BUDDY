@@ -216,11 +216,11 @@ export default function LandingPage() {
                 letterSpacing: "0.02em",
               }}
             >
-              DOMINATE THE{" "}
+              FIND YOUR{" "}
               <span className="text-gradient" style={{ display: "block" }}>
-                LEADERBOARD
+                GYM PARTNER
               </span>
-              WITH YOUR SQUAD
+              AT VIT
             </h1>
 
             <p
@@ -231,7 +231,10 @@ export default function LandingPage() {
                 maxWidth: "440px",
               }}
             >
-              The ultimate VIT fitness social platform. Join exclusive <span style={{ color: "white" }}>Gym Groups</span>, track your <span style={{ color: "white" }}>Personal Records</span>, and climb the rankings together.
+              Stop training alone. GymBuddy matches you with VIT students who share your{" "}
+              <span style={{ color: "white" }}>workout schedule</span>,{" "}
+              <span style={{ color: "white" }}>fitness goals</span>, and{" "}
+              <span style={{ color: "white" }}>training style</span>.
             </p>
 
             <div className="flex flex-wrap gap-3">
